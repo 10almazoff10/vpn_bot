@@ -1,0 +1,10 @@
+# Определение версии Docker Compose и начало описания сервисов
+version: '3'
+
+services:
+  vpn_bot:
+    # Сборка образа для сервиса из директории
+    build: vpn_bot/
+    # Задание имени контейнера для сервиса
+    container_name: python_bot
+    command: python ./main.py
