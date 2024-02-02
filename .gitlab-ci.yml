@@ -19,18 +19,3 @@ cache:
 
 before_script:
   - sudo apt update && sudo apt install ansible -y
-
-run:
-  script:
-    #- pip install -r ./main/requirements.txt
-    # run the command here
-  artifacts:
-    paths:
-      - build/*
-
-
-deploy:
-  stage: deploy
-  script:
-    - python3 ./main/main.py
-  environment: production
