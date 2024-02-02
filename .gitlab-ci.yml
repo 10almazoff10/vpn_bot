@@ -1,3 +1,3 @@
 run:
   script:
-    - 'sudo apt update && sudo apt install ansible -y'
+    - whoami
