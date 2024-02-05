@@ -18,12 +18,7 @@ cache:
     - .cache/pip
 
 before_script:
-  - sudo apt install python3 python3-pip -y
-  - python --version ; pip --version  # For debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-
+  - ll
 test:
   script:
     - pip install ruff tox  # you can also use tox
