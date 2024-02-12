@@ -106,7 +106,7 @@ def get_operations_user(message, count=10):
     return select_many_from_db(f"""select operations.id, operations.summ, operations.operation_date, operation_types.type_name  from operations
                                     join operation_types on operation_types.id = operations.type 
                                     where user_id = (select id from users where telegram_id = '{message.from_user.id}') 
-                                    ORDER BY id ASC LIMIT {count}""")
+                                    ORDER BY id DESC LIMIT {count}""")
 
 def get_user_vpn_keys(message):
     return select_many_from_db(f"""SELECT access_url from users_vpn_keys
