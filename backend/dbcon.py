@@ -15,7 +15,7 @@ DB_HOST = config.DB_HOST
 def select_from_db(req):
     try:
         # пытаемся подключиться к базе данных
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=15432)
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     except:
         # в случае сбоя подключения будет выведено сообщение в STDOUT
         print('Can`t establish connection to database')
@@ -30,7 +30,7 @@ def select_from_db(req):
 def select_many_from_db(req):
     try:
         # пытаемся подключиться к базе данных
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=15432)
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     except:
         # в случае сбоя подключения будет выведено сообщение в STDOUT
         print('Can`t establish connection to database')
@@ -44,7 +44,7 @@ def select_many_from_db(req):
 def insert_in_db(req):
     try:
         # пытаемся подключиться к базе данных
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=15432)
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     except:
         # в случае сбоя подключения будет выведено сообщение в STDOUT
         print('Can`t establish connection to database')
@@ -57,10 +57,12 @@ def insert_in_db(req):
 
 def add_new_user(message):
     telegram_id = message.from_user.id
+    name = message.from_user.first_name
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     status = 10
-    insert_in_db(f"INSERT INTO users (telegram_id, date_first_enter, status) VALUES ({telegram_id}, '{date}', {status})")
+    insert_in_db(f"INSERT INTO users (telegram_id, name, date_first_enter, status) VALUES ({telegram_id}, '{name}','{date}', {status})")
+    insert_in_db(f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
 
 
 def check_user_indb(message):
@@ -77,24 +79,11 @@ def set_status(message, status):
 def get_status(message):
     return select_from_db(f"SELECT status from users where telegram_id = '{message.from_user.id}'")[0]
 
-def check_token(message):
-    try:
-        return select_from_db(f"SELECT telegram_id from users_auth where reg_token = '{message.text}'")[0]
-    except:
-        return ""
-
-def user_reg(message):
-    insert_in_db(f"UPDATE users_auth SET telegram_id = '{message.from_user.id}' where reg_token = '{message.text}'")
-    insert_in_db(f"UPDATE users SET reg_token = '{message.text}' where telegram_id = '{message.from_user.id}'")
-    dt = datetime.now()
-    date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT user_id FROM users_auth WHERE reg_token = '{message.text}'));")
-
 def user_name(message):
-    return select_from_db(f"SELECT user_name FROM users_auth WHERE telegram_id = '{message.from_user.id}'")[0]
+    return select_from_db(f"SELECT user_name FROM users WHERE telegram_id = '{message.from_user.id}'")[0]
 
 def get_user_balance(message):
-    return  select_from_db(f"SELECT balance from users_auth where telegram_id = '{message.from_user.id}'")[0]
+    return  select_from_db(f"SELECT balance from users where telegram_id = '{message.from_user.id}'")[0]
 
 def create_support_task(message):
     telegram_id = message.from_user.id
@@ -108,20 +97,20 @@ def create_support_task(message):
     return tasks
 
 def calc_balances():
-    id_list = select_many_from_db("select user_id from users_auth")
+    id_list = select_many_from_db("select id from users")
     for id in id_list:
-        insert_in_db(f"update users_auth set balance = (select SUM(summ) from operations where user_id = {id[0]}) where user_id = {id[0]};")
+        insert_in_db(f"update users set balance = (select SUM(summ) from operations where user_id = {id[0]}) where id = {id[0]};")
 
 def get_operations_user(message, count=10):
     
     return select_many_from_db(f"""select operations.id, operations.summ, operations.operation_date, operation_types.type_name  from operations
                                     join operation_types on operation_types.id = operations.type 
-                                    where user_id = (select user_id from users_auth where telegram_id = '{message.from_user.id}') 
-                                    ORDER BY id ASC LIMIT {count}""")
+                                    where user_id = (select id from users where telegram_id = '{message.from_user.id}') 
+                                    ORDER BY id DESC LIMIT {count}""")
 
 def get_user_vpn_keys(message):
-    return select_many_from_db(f"""SELECT user_password, date_reg, acess_url from users_vpn_keys
-                               where user_id = (select user_id from users_auth where telegram_id = '{message.from_user.id}')""")
+    return select_many_from_db(f"""SELECT access_url from users_vpn_keys
+                               where user_name = '{message.from_user.id}'""")
 
 
 def get_users_from_outline():
@@ -141,31 +130,36 @@ def get_users_from_outline():
         password = ''.join(secrets.choice(alphabet) for i in range(10))
 
         insert_in_db(f"insert into users_auth (user_id, user_name, reg_token) values ('{id}','{name}', '{password}')")
-        insert_in_db(f"""insert into users_vpn_keys (user_id, user_password, user_name, acess_url, port, date_reg)
+        insert_in_db(f"""insert into users_vpn_keys (user_id, user_password, user_name, access_url, port, date_reg)
                            values ({id}, '{password}', '{name}', '{accessUrl}', '{port}', '{date}') """)
         
         insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', {id});")
         
 
 
+
 def create_new_key(message):
-    name = select_from_db(f"SELECT user_name FROM users_auth where telegram_id = '{message.from_user.id}'")
-    key = outline.create_new_key(name)
-    pass
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
+    telegram_id = message.from_user.id
+    data = outline.create_new_key(telegram_id)
+    key = data[1]
+    key_id = data[0]
+    insert_in_db(f"""insert into users_vpn_keys (key_id, user_name, access_url, date_reg)
+                           values ('{key_id}',{telegram_id}, '{key}', '{date}') """)
+
 
 ########### ADMIN ############
 
 def get_list_users():
-    return select_many_from_db(f"select user_name, telegram_id, balance, user_id, reg_token from users_auth")
+    return select_many_from_db(f"select name, telegram_id, balance, id from users")
 
-def create_user_token(message):
-    alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for i in range(10))
-    client_name = message.text
-    insert_in_db(f"insert into users_auth (reg_token, user_name) values ('{password}', '{client_name}')")
-    return password
 
 def add_money_to_user_from_buffer(message):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values ((select summ from operation_buffer), 2, '{date}', (select user_id from operation_buffer))")
+
+def get_list_keys():
+    select_many_from_db(f"id from users")
+

@@ -142,9 +142,11 @@ def create_new_key(message):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     telegram_id = message.from_user.id
-    key = outline.create_new_key(telegram_id)
-    insert_in_db(f"""insert into users_vpn_keys (user_name, access_url, date_reg)
-                           values ({telegram_id}, '{key}', '{date}') """)
+    data = outline.create_new_key(telegram_id)
+    key = data[1]
+    key_id = data[0]
+    insert_in_db(f"""insert into users_vpn_keys (key_id, user_name, access_url, date_reg)
+                           values ('{key_id}',{telegram_id}, '{key}', '{date}') """)
 
 
 ########### ADMIN ############

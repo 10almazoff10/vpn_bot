@@ -13,8 +13,10 @@ def create_new_key(telegram_id):
     response = json.loads(requests.post(f"{API_KEY}/access-keys", verify=False).text)
     id = response["id"]
     accessUrl = response["accessUrl"]
+    data = []
+    data.append(id, accessUrl)
     requests.put(f"{API_KEY}/access-keys/{id}/name", data={'name':f"{telegram_id}"}, verify=False)
-    return accessUrl
+    return data
 
 def remove_key(id):
     requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
