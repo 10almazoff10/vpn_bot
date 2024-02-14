@@ -8,6 +8,9 @@ import time
 
 PRICE_PER_MOUNTH = 50
 
+API_TOKEN = config.API_KEY
+bot = telebot.TeleBot(API_TOKEN)
+
 def days_in_mounth():
     current_year = datetime.now().year
     month = datetime.now().month
@@ -35,8 +38,7 @@ def send_give_price():
                                                     ON V.user_name = U.telegram_id;""")
     for user in users_balance:
         if float(user[1]) < 10 and float(user[1]) > -5:
-            API_TOKEN = config.API_KEY
-            bot = telebot.TeleBot(API_TOKEN)
+            
             bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\n
                                             Напоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
         elif float(user[1]) < -5:
@@ -53,8 +55,9 @@ schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-    print("Backend is UP!")
 
+if __name__ == "__main__":
+    bot.send_message(758952233, "Backend started success")
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
