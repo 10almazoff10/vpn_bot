@@ -13,7 +13,7 @@ ADD main.py /src/
 ADD messages.py /src/
 ADD outline_api_reqests.py /src/
 ADD tg_keyboard.py /src/
-ADD run_minus.sh /etc/cron.hourly/
-RUN chmod 777 /etc/cron.hourly/run_minus.sh
+ADD backend.py /src/
 
+CMD [ "python", "./backend.py &"]
 CMD [ "python", "./main.py" ]

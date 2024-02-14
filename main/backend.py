@@ -55,4 +55,5 @@ schedule.every().day.at("10:30").do(send_give_price)
 while True:
     schedule.run_pending()
     time.sleep(1)
+    print("Backend is UP!")
 
