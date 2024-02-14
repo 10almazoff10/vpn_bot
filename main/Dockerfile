@@ -3,8 +3,6 @@
 FROM python:latest
 WORKDIR /src/
 ADD requirements.txt /src/
-RUN apt update && apt install cron -y 
-RUN service cron start
 RUN pip install --no-cache-dir -r requirements.txt
 
 ADD config.py /src/
