@@ -14,6 +14,6 @@ ADD messages.py /src/
 ADD outline_api_reqests.py /src/
 ADD tg_keyboard.py /src/
 ADD backend.py /src/
+ADD run.sh /src/
 
-CMD [ "python", "./backend.py &"]
-CMD [ "python", "./main.py" ]
+CMD [ "./run.sh"]
