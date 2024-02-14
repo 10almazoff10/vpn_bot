@@ -1,5 +1,5 @@
 #!/bin/bash
 
-python3 ./backend.py &
-python3 ./main.py
+python /src/backend.py &
+python /src/main.py
 
