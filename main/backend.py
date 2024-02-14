@@ -45,10 +45,11 @@ def send_give_price():
             dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
             bot.send_message(user[0], f"""Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.""")
             
-    
+def update_balance():
+    dbcon.calc_balances()
 
 schedule.every().day.at("01:00").do(one_day_using)
-schedule.every().hour.at(":00").do(dbcon.calc_balances())
+schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 
 
