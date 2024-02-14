@@ -59,7 +59,9 @@ schedule.every().day.at("10:30").do(send_give_price)
 
 
 if __name__ == "__main__":
-    bot.send_message(758952233, "Backend started success")
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
+    bot.send_message(758952233, f"Backend started success - {date}")
     while True:
         schedule.run_pending()
         time.sleep(1)
