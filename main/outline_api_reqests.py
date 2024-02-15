@@ -14,7 +14,8 @@ def create_new_key(telegram_id):
     id = response["id"]
     accessUrl = response["accessUrl"]
     data = []
-    data.append(id, accessUrl)
+    data.append(id)
+    data.append(accessUrl)
     requests.put(f"{API_KEY}/access-keys/{id}/name", data={'name':f"{telegram_id}"}, verify=False)
     return data
 

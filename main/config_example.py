@@ -1,5 +1,5 @@
 API_KEY= "**************"
-OUTLINE_API_URL="***************"
+OUTLINE_API_KEY="***************"
 
 
 DB_NAME = "vpndb"
