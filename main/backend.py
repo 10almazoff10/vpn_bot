@@ -6,7 +6,7 @@ import telebot
 import schedule
 import time
 
-PRICE_PER_MOUNTH = 50
+PRICE_PER_MOUNTH = 75
 
 API_TOKEN = config.API_KEY
 bot = telebot.TeleBot(API_TOKEN)
