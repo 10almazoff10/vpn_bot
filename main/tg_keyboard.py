@@ -18,7 +18,7 @@ def admin_keyboard():
     button1 = telebot.types.KeyboardButton(text="Список пользователей")
     button2 = telebot.types.KeyboardButton(text="Пополнить баланс пользователя")
     button3 = telebot.types.KeyboardButton(text="Написать сообщение пользователю")
-    button4 = telebot.types.KeyboardButton(text="Создать токен пользователя")
+    button4 = telebot.types.KeyboardButton(text="Выручка")
     button5 = telebot.types.KeyboardButton(text="Управление ключами VPN")
     button_exit = telebot.types.KeyboardButton(text="Выход из админки")
     keyboard.add(button1, button2)

@@ -149,10 +149,6 @@ def status(message):
         elif message.text == "Выход из админки":
             dbcon.set_status(message, 20)
             bot.send_message(message.from_user.id, f"Выход...",reply_markup=tg_keyboard.main_keyboard())
-        
-        elif message.text == "Создать токен пользователя":
-            dbcon.set_status(message, 98)
-            bot.send_message(message.from_user.id, f"Введите имя клиента")
 
         elif message.text == "Пополнить баланс пользователя":
             dbcon.set_status(message, 97)
@@ -161,6 +157,11 @@ def status(message):
         elif message.text == "Управление ключами VPN":
             dbcon.set_status(message, 100)
             bot.send_message(message.from_user.id,"Переход в управление ключами",reply_markup=tg_keyboard.admin_keyboard_keys())
+        
+        elif message.text == "Выручка":
+            money_all = dbcon.select_from_db("select sum(summ) from operations where type = 2")
+            money_lasy_mounth = dbcon.select_from_db("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 mounth'))")
+            bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_lasy_mounth}\nВыручка за все время: {money_all}",reply_markup=tg_keyboard.admin_keyboard_keys())
 
         else:
             bot.send_message(message.from_user.id, f"Я вас не понял",reply_markup=tg_keyboard.admin_keyboard())
@@ -183,12 +184,6 @@ def status(message):
             dbcon.set_status(message, 99)
             bot.send_message(message.from_user.id, "Переход в админ-панель",reply_markup=tg_keyboard.admin_keyboard())
 
-
-    elif user_status == 98:
-        dbcon.set_status(message, 99)
-        token = dbcon.create_user_token(message)
-        bot.send_message(message.from_user.id, "Токен успешно создан")
-        bot.send_message(message.from_user.id, token)
 
     elif user_status == 97:
         dbcon.set_status(message, 96)
