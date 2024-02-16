@@ -159,9 +159,9 @@ def status(message):
             bot.send_message(message.from_user.id,"Переход в управление ключами",reply_markup=tg_keyboard.admin_keyboard_keys())
         
         elif message.text == "Выручка":
-            money_all = dbcon.select_from_db("select sum(summ) from operations where type = 2")
-            money_lasy_mounth = dbcon.select_from_db("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 mounth'))")
-            bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_lasy_mounth}\nВыручка за все время: {money_all}",reply_markup=tg_keyboard.admin_keyboard_keys())
+            money_all = dbcon.select_from_db("select sum(summ) from operations where type = 2")[0]
+            money_last_mounth = dbcon.select_from_db("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
+            bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
         else:
             bot.send_message(message.from_user.id, f"Я вас не понял",reply_markup=tg_keyboard.admin_keyboard())
