@@ -104,6 +104,7 @@ def status(message):
 
     elif user_status == 30:
         task_id = dbcon.create_support_task(message)
+        bot.send_message(758952233, f"Пользователь {message.from_user.id} оставил сообщение:\n{message.text}")
         dbcon.set_status(message, 20)
         bot.send_message(message.from_user.id, f"Ваше обращение № {task_id} зарегистрировано.",reply_markup=tg_keyboard.main_keyboard())
 
