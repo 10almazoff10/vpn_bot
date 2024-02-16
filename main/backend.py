@@ -86,7 +86,10 @@ schedule.every().day.at("10:30").do(send_give_price)
 if __name__ == "__main__":
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    bot.send_message(758952233, f"Backend started success - {date}")
+    get_key_traffic()
+    bot.send_message(758952233, f"Бэкэнд запущен - {date}\nВыполнено обновление прогрузки трафика")
+
+
     while True:
         schedule.run_pending()
         time.sleep(1)
