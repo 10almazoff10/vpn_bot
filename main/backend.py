@@ -56,8 +56,6 @@ schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 
-one_day_using()
-
 if __name__ == "__main__":
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
