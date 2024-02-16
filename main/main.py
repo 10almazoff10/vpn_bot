@@ -81,7 +81,7 @@ def status(message):
             dbcon.set_status(message, 40)
             bot.send_message(message.from_user.id, "Введите количество операций:", reply_markup=tg_keyboard.num_keyboard())
         
-        elif message.text == "Получить ключ для VPN":
+        elif message.text == "Ключ VPN":
 
             if dbcon.get_user_balance(message) > -5:
 
