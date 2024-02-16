@@ -112,6 +112,8 @@ def get_user_vpn_keys(message):
     return select_many_from_db(f"""SELECT access_url from users_vpn_keys
                                where user_name = '{message.from_user.id}'""")
 
+def get_user_traffic(message):
+    return select_from_db(f"select traffic from users_vpn_keys where user_name = '{message.from_user.id}'")[0]
 
 def get_users_from_outline():
     response = outline.get_all_api_keys()
@@ -161,5 +163,5 @@ def add_money_to_user_from_buffer(message):
     insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values ((select summ from operation_buffer), 2, '{date}', (select user_id from operation_buffer))")
 
 def get_list_keys():
-    select_many_from_db(f"id from users")
+    return select_many_from_db(f"select key_id, user_name from users_vpn_keys order by key_id asc;")
 

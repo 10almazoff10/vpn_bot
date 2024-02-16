@@ -2,6 +2,8 @@ from datetime import datetime
 from calendar import monthrange
 import dbcon, config, outline_api_reqests
 import telebot
+import math
+
 
 import schedule
 import time
@@ -52,8 +54,33 @@ def update_balance():
     dbcon.calc_balances()
     bot.send_message(758952233, f"Баланс успшно обновлен")
 
+
+
+def convert_size(size_bytes):
+   if size_bytes == 0:
+       return "0B"
+   size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+   i = int(math.floor(math.log(size_bytes, 1024)))
+   p = math.pow(1024, i)
+   s = round(size_bytes / p, 2)
+   return "%s %s" % (s, size_name[i])
+
+def get_key_traffic():
+    data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
+    key_id = dbcon.get_list_keys()
+
+    for i in key_id:
+        try:
+            traffic = convert_size(int(data[f"{i[0]}"]))
+            dbcon.insert_in_db(f"update users_vpn_keys set traffic = '{traffic}' where key_id = {i[0]};")
+        except:
+            pass
+
+
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
+schedule.every().hour.at(":00").do(get_key_traffic)
+
 schedule.every().day.at("10:30").do(send_give_price)
 
 if __name__ == "__main__":

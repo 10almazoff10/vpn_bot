@@ -73,6 +73,10 @@ def status(message):
         elif message.text == "Пополнить":
             bot.send_message(message.from_user.id, "СБП `+79635122453` Тинькофф🙂", parse_mode="MARKDOWN")
         
+        elif message.text == "Трафик":
+            traffic = dbcon.get_user_traffic(message)
+            bot.send_message(message.from_user.id, f"За последние 30 дней загружено {traffic}", parse_mode="MARKDOWN")
+        
         elif message.text == "Последние операции":
             dbcon.set_status(message, 40)
             bot.send_message(message.from_user.id, "Введите количество операций:", reply_markup=tg_keyboard.num_keyboard())
