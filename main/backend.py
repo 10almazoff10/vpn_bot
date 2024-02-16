@@ -48,14 +48,15 @@ def send_give_price():
             bot.send_message(758952233, f"Удален пользователь {user[0]}")
             bot.send_message(user[0], f"""Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.""")
             
-def update_balance():
+def update_balance():    
     dbcon.calc_balances()
+    bot.send_message(758952233, f"Баланс успшно обновлен")
 
-schedule.every().day.at("01:00").do(one_day_using)
+schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 
-
+one_day_using()
 
 if __name__ == "__main__":
     dt = datetime.now()
