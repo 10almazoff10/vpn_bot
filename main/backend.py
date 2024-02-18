@@ -40,15 +40,24 @@ def send_give_price():
                                                     ON V.user_name = U.telegram_id;""")
     for user in users_balance:
         if float(user[1]) < 10 and float(user[1]) > -5:
-            bot.send_message(758952233, f"Пользователю {user[0]} отправлено сообщение о низком балансе")
-            bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
+            bot.send_message(758952233, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
+            try:
+                bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
+                bot.send_message(758952233, f"Успешно отправлено")
+            except:
+                bot.send_message(758952233, f"Не удалось отправить...")
+
         elif float(user[1]) < -5:
             id = user[2]
             outline_api_reqests.remove_key(id)
             dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
 
-            bot.send_message(758952233, f"Удален пользователь {user[0]}")
-            bot.send_message(user[0], f"""Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.""")
+            bot.send_message(758952233, f"Удаляю пользователя {user[0]}")
+            try:
+                bot.send_message(user[0], f"""Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.""")
+                bot.send_message(758952233, f"Пользователь удален {user[0]}")
+            except:
+                bot.send_message(758952233, f"Ошибка удаления пользователя {user[0]}")
             
 def update_balance():    
     dbcon.calc_balances()
