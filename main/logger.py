@@ -16,3 +16,9 @@ def logger(logs):
     except:
         with open(logFile, "w") as file:
             file.write("Developed by Prokin.O\nSoft-Logic. 2024\n")
+
+def get_file_log():
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d")
+    logFile = f"{LOGS_DIR}/telebot-{date}.log"
+    return open(logFile, "rb")

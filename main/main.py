@@ -2,7 +2,7 @@
 
 import telebot
 import config, dbcon, tg_keyboard, messages
-from logger import logger
+from logger import logger, get_file_log
 
 API_TOKEN = config.API_KEY
 
@@ -161,6 +161,11 @@ def status(message):
         elif message.text == "Управление ключами VPN":
             dbcon.set_status(message, 100)
             bot.send_message(message.from_user.id,"Переход в управление ключами",reply_markup=tg_keyboard.admin_keyboard_keys())
+
+        elif message.text == "Логи":
+            bot.send_message(message.from_user.id,"Отправляю логи...",reply_markup=tg_keyboard.admin_keyboard_keys())
+            file = get_file_log()
+            bot.send_document(message.from_user.id, file)
         
         elif message.text == "Выручка":
             money_all = dbcon.select_from_db("select sum(summ) from operations where type = 2")[0]
