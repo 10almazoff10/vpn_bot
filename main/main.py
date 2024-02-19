@@ -165,7 +165,7 @@ def status(message):
             bot.send_message(message.from_user.id,"Переход в управление ключами",reply_markup=tg_keyboard.admin_keyboard_keys())
 
         elif message.text == "Логи":
-            bot.send_message(message.from_user.id,"Отправляю логи...",reply_markup=tg_keyboard.admin_keyboard_keys())
+            bot.send_message(message.from_user.id,"Отправляю логи...")
             file = get_file_log()
             bot.send_document(message.from_user.id, file)
         
