@@ -8,6 +8,8 @@ import math
 import schedule
 import time
 
+VERSION = "1.0.1"
+
 PRICE_PER_MOUNTH = 75
 
 API_TOKEN = config.API_KEY
@@ -96,7 +98,7 @@ if __name__ == "__main__":
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     get_key_traffic()
-    bot.send_message(758952233, f"Бэкэнд запущен - {date}\nВыполнено обновление прогрузки трафика")
+    bot.send_message(758952233, f"Бэкэнд запущен - {date}\nВыполнено обновление прогрузки трафика\n{VERSION}")
 
 
     while True:
