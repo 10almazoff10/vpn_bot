@@ -6,7 +6,7 @@ LOGS_DIR = "/opt/logs"
 def logger(logs):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d")
-    logFile = f"{LOGS_DIR}/telebot-{date}.log"
+    logFile = f"{LOGS_DIR}/telebot-{date}.txt"
     try:
         with open(logFile, "a") as file:
                 dt = datetime.now()
