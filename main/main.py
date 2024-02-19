@@ -8,6 +8,8 @@ API_TOKEN = config.API_KEY
 
 bot = telebot.TeleBot(API_TOKEN)
 
+logger("************VPN-BOT by Prokin************")
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
