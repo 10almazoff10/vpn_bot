@@ -61,7 +61,7 @@ def send_give_price():
             
 def update_balance():    
     dbcon.calc_balances()
-    bot.send_message(758952233, f"Баланс успшно обновлен")
+    bot.send_message(758952233, f"Баланс успешно обновлен")
 
 
 
