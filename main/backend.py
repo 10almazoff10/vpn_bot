@@ -3,12 +3,12 @@ from calendar import monthrange
 import dbcon, config, outline_api_reqests
 import telebot
 import math
-
-
 import schedule
 import time
+from logger import logger
 
-VERSION = "1.0.1"
+
+VERSION = "1.0.2 - 2024.12.19"
 
 PRICE_PER_MOUNTH = 75
 
@@ -63,6 +63,7 @@ def send_give_price():
             
 def update_balance():    
     dbcon.calc_balances()
+    logger("Просчитываем баланс пользователей...")
     bot.send_message(758952233, f"Баланс успешно обновлен")
 
 
@@ -79,26 +80,28 @@ def convert_size(size_bytes):
 def get_key_traffic():
     data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
     key_id = dbcon.get_list_keys()
+    logger("Выполняется загрузка информации о трафике..")
 
     for i in key_id:
         try:
             traffic = convert_size(int(data[f"{i[0]}"]))
+
             dbcon.insert_in_db(f"update users_vpn_keys set traffic = '{traffic}' where key_id = {i[0]};")
         except:
             pass
-
+    logger("Загрузка выполнена.")
 
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().hour.at(":00").do(get_key_traffic)
-
 schedule.every().day.at("10:30").do(send_give_price)
 
 if __name__ == "__main__":
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     get_key_traffic()
-    bot.send_message(758952233, f"Бэкэнд запущен - {date}\nВыполнено обновление прогрузки трафика\n{VERSION}")
+    logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
+    bot.send_message(758952233, f"Сервер запущен - {date}\nВерсия - {VERSION}")
 
 
     while True:

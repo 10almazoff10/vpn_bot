@@ -9,3 +9,4 @@ services:
     container_name: python_bot
     volumes:
       - /etc/localtime:/etc/localtime
+      - /opt/bot-logs:/opt/logs

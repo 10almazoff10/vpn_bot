@@ -2,6 +2,8 @@
 
 import telebot
 import config, dbcon, tg_keyboard, messages
+from logger import logger
+
 API_TOKEN = config.API_KEY
 
 bot = telebot.TeleBot(API_TOKEN)
@@ -9,6 +11,7 @@ bot = telebot.TeleBot(API_TOKEN)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
     if dbcon.check_user_indb(message):
         print("user find")
         bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN.by_Prokin.",reply_markup=tg_keyboard.main_keyboard())
@@ -57,6 +60,7 @@ def send_message(message):
 
 @bot.message_handler(func=lambda message: True)
 def status(message):
+    logger(f"Пользователь {message.from_user.id} написал - {message.text}")
     user_status = dbcon.get_status(message)
     print(message.from_user.id, user_status, message.text)
     
