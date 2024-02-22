@@ -30,7 +30,7 @@ def one_day_using():
     	               {one_day_price},
     		       4,
             	       '{date}',
-                	id FROM users;
+                	id FROM users where balance > '-5';
                 	""")
 
 
@@ -64,7 +64,6 @@ def send_give_price():
 def update_balance():    
     dbcon.calc_balances()
     logger("Просчитываем баланс пользователей...")
-    bot.send_message(758952233, f"Баланс успешно обновлен")
 
 
 
