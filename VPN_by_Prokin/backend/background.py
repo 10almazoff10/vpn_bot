@@ -1,16 +1,16 @@
 from datetime import datetime
 from calendar import monthrange
-from VPN_by_Prokin.commands import dbcon
-from VPN_by_Prokin.commands import outline_api_reqests
-from VPN_by_Prokin.app import config
+from app.commands import dbcon
+from app.commands import outline_api_reqests
+from app import config
 import telebot
 import math
 import schedule
 import time
-from VPN_by_Prokin.logs.logger import logger
+from app.logs.logger import logger
 
 
-VERSION = "1.0.2 - 2024.12.19"
+VERSION = "1.0.3 - 2024.03.13"
 
 PRICE_PER_MOUNTH = 75
 

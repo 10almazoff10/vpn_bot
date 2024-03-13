@@ -1,5 +1,5 @@
 from datetime import datetime
-from VPN_by_Prokin.app import config
+from app import config
 
 LOGS_DIR = config.LOGS_DIR
 # Логгер для отладки

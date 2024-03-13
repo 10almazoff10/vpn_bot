@@ -1,16 +1,16 @@
 ---
 telegram:
-  api: "6577838059:AAHYKrSVEPZVg9DKHEBEO9lWT_DBznUNeqc"
+  api: "5779279148:AAGot2SPqlcKnT6qmTUcUnDFwMMR_ySbJ5Y"
 
 outline:
   api: "https://95.169.181.151:34466/QJTInLnpDhvy4abdgS0aUQ/"
 
 database:
-  host: 127.0.0.1
+  host: postgres
   port: 5432
   user: postgres
-  pass: 123
+  pass: GA9d0zuiCvno9Oy7zUPO
   base_name: vpndb
 
 logs:
-  dir: /tmp
+  dir: /opt/logs

@@ -2,11 +2,11 @@
 
 import telebot
 from threading import Thread
-from VPN_by_Prokin.app.text import tg_keyboard, messages
-from VPN_by_Prokin.commands import dbcon
-from VPN_by_Prokin.logs import logger
-from VPN_by_Prokin.app import config
-from VPN_by_Prokin.backend import background
+from app.text import tg_keyboard, messages
+from app.commands import dbcon
+from app.logs import logger
+from app import config
+from backend import background
 
 #Run Backend
 backend = Thread(target=background.run_backend)

@@ -1,4 +1,4 @@
-from VPN_by_Prokin.app import config
+from app import config
 import requests
 import json
 from datetime import datetime

@@ -10,3 +10,10 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - /opt/bot-logs:/opt/logs
+    networks:
+      - proxynet
+
+networks:
+  proxynet:
+    name: vpn_bot_default
+    external: true
