@@ -1,11 +1,13 @@
 from datetime import datetime
 from calendar import monthrange
-import dbcon, config, outline_api_reqests
+from VPN_by_Prokin.commands import dbcon
+from VPN_by_Prokin.commands import outline_api_reqests
+from VPN_by_Prokin.app import config
 import telebot
 import math
 import schedule
 import time
-from logger import logger
+from VPN_by_Prokin.logs.logger import logger
 
 
 VERSION = "1.0.2 - 2024.12.19"
@@ -46,7 +48,7 @@ def send_give_price():
             try:
                 bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
                 bot.send_message(758952233, f"Успешно отправлено")
-            except:
+            except :
                 bot.send_message(758952233, f"Не удалось отправить...")
 
         elif float(user[1]) < -5:
@@ -95,13 +97,12 @@ schedule.every().hour.at(":00").do(update_balance)
 schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
 
-if __name__ == "__main__":
+def run_backend():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     get_key_traffic()
     logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
     bot.send_message(758952233, f"Сервер запущен - {date}\nВерсия - {VERSION}")
-
 
     while True:
         schedule.run_pending()

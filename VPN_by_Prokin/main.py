@@ -1,26 +1,31 @@
 #!/usr/bin/python
 
 import telebot
-import config, dbcon, tg_keyboard, messages
-from logger import logger, get_file_log
+from threading import Thread
+from VPN_by_Prokin.app.text import tg_keyboard, messages
+from VPN_by_Prokin.commands import dbcon
+from VPN_by_Prokin.logs import logger
+from VPN_by_Prokin.app import config
+from VPN_by_Prokin.backend import background
+
+#Run Backend
+backend = Thread(target=background.run_backend)
+backend.start()
 
 API_TOKEN = config.API_KEY
 
 bot = telebot.TeleBot(API_TOKEN)
 
-logger("************VPN-BOT by Prokin************")
-
-
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
+    logger.logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
     if dbcon.check_user_indb(message):
         print("user find")
-        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN.by_Prokin.",reply_markup=tg_keyboard.main_keyboard())
+        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.", reply_markup=tg_keyboard.main_keyboard())
         dbcon.set_status(message, 20)
     else:
         print("Зарегистрирован новый пользователь!")
-        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN.by_Prokin.",reply_markup=tg_keyboard.main_keyboard())
+        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.", reply_markup=tg_keyboard.main_keyboard())
         dbcon.add_new_user(message)
         dbcon.set_status(message, 20)
 
@@ -62,7 +67,7 @@ def send_message(message):
 
 @bot.message_handler(func=lambda message: True)
 def status(message):
-    logger(f"Пользователь {message.from_user.id} написал - {message.text}")
+    logger.logger(f"Пользователь {message.from_user.id} написал - {message.text}")
     user_status = dbcon.get_status(message)
     print(message.from_user.id, user_status, message.text)
     
@@ -70,7 +75,7 @@ def status(message):
         if message.text == "Баланс":
             dbcon.calc_balances()
             balanse = dbcon.get_user_balance(message)
-            bot.send_message(message.from_user.id, f"Ваш баланс {balanse} руб.",reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(message.from_user.id, f"Ваш баланс {balanse} руб.", reply_markup=tg_keyboard.main_keyboard())
 
         elif message.text == "Написать в поддержку":
             dbcon.set_status(message, 30)
@@ -97,26 +102,26 @@ def status(message):
                 print(keys)
                 if keys == []:
                     dbcon.set_status(message, 51)
-                    bot.send_message(message.from_user.id, "На данный момент ключей не зарегистрировано.\nЖелаете зарегистрировать?",reply_markup=tg_keyboard.yes_or_no_keyboard())
+                    bot.send_message(message.from_user.id, "На данный момент ключей не зарегистрировано.\nЖелаете зарегистрировать?", reply_markup=tg_keyboard.yes_or_no_keyboard())
                 elif keys != []:
                     user_keys = str()
                     for key in keys:
                         user_keys = user_keys + f"Ключ для подключения:\n`{key[0]}`\n-----------\n"
                     
                     dbcon.set_status(message, 20)
-                    bot.send_message(message.from_user.id, user_keys, parse_mode="MARKDOWN",reply_markup=tg_keyboard.main_keyboard())
+                    bot.send_message(message.from_user.id, user_keys, parse_mode="MARKDOWN", reply_markup=tg_keyboard.main_keyboard())
                     bot.send_message(message.from_user.id, "Инструкция по подключению - /help")
             else:
-                bot.send_message(message.from_user.id, "Ваш баланс менее -5 рублей, пожалуйста, пополните баланс для создания нового ключа", parse_mode="MARKDOWN",reply_markup=tg_keyboard.main_keyboard())
+                bot.send_message(message.from_user.id, "Ваш баланс менее -5 рублей, пожалуйста, пополните баланс для создания нового ключа", parse_mode="MARKDOWN", reply_markup=tg_keyboard.main_keyboard())
         
         else:
-            bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...",reply_markup=tg_keyboard.main_keyboard())            
+            bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...", reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == 30:
         task_id = dbcon.create_support_task(message)
         bot.send_message(758952233, f"Пользователь {message.from_user.id} оставил сообщение:\n{message.text}")
         dbcon.set_status(message, 20)
-        bot.send_message(message.from_user.id, f"Ваше обращение № {task_id} зарегистрировано.",reply_markup=tg_keyboard.main_keyboard())
+        bot.send_message(message.from_user.id, f"Ваше обращение № {task_id} зарегистрировано.", reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == 40:
         operations_list = dbcon.get_operations_user(message, message.text)
@@ -137,10 +142,10 @@ def status(message):
                 
             dbcon.set_status(message, 20)
             bot.send_message(message.from_user.id, user_keys, parse_mode="MARKDOWN", reply_markup=tg_keyboard.main_keyboard())
-            bot.send_message(message.from_user.id, "Информацию по активации ключа можно получить в команде /help",reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(message.from_user.id, "Информацию по активации ключа можно получить в команде /help", reply_markup=tg_keyboard.main_keyboard())
 
         elif message.text == "Нет":
-            bot.send_message(message.from_user.id, "Отмена...",reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(message.from_user.id, "Отмена...", reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, 20)
 
 
@@ -154,7 +159,7 @@ def status(message):
         
         elif message.text == "Выход из админки":
             dbcon.set_status(message, 20)
-            bot.send_message(message.from_user.id, f"Выход...",reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(message.from_user.id, f"Выход...", reply_markup=tg_keyboard.main_keyboard())
 
         elif message.text == "Пополнить баланс пользователя":
             dbcon.set_status(message, 97)
@@ -162,11 +167,11 @@ def status(message):
 
         elif message.text == "Управление ключами VPN":
             dbcon.set_status(message, 100)
-            bot.send_message(message.from_user.id,"Переход в управление ключами",reply_markup=tg_keyboard.admin_keyboard_keys())
+            bot.send_message(message.from_user.id,"Переход в управление ключами", reply_markup=tg_keyboard.admin_keyboard_keys())
 
         elif message.text == "Логи":
             bot.send_message(message.from_user.id,"Отправляю логи...")
-            file = get_file_log()
+            file = logger.get_file_log()
             bot.send_document(message.from_user.id, file)
         
         elif message.text == "Выручка":
@@ -175,7 +180,7 @@ def status(message):
             bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
         else:
-            bot.send_message(message.from_user.id, f"Я вас не понял",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, f"Я вас не понял", reply_markup=tg_keyboard.admin_keyboard())
 
     elif user_status >= 100 and user_status <= 110:
 
@@ -190,10 +195,10 @@ def status(message):
         
         elif message.text == "Выход":
             dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Переход в админ-панель",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, "Переход в админ-панель", reply_markup=tg_keyboard.admin_keyboard())
         else:
             dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Переход в админ-панель",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, "Переход в админ-панель", reply_markup=tg_keyboard.admin_keyboard())
 
 
     elif user_status == 97:
@@ -201,36 +206,36 @@ def status(message):
         data = message.text.split()
         id = data[0]
         summ = data[1]
-        bot.send_message(message.from_user.id, f"Пополнить ID {id} на сумму {summ} руб. Верно?",reply_markup=tg_keyboard.yes_or_no_keyboard())
+        bot.send_message(message.from_user.id, f"Пополнить ID {id} на сумму {summ} руб. Верно?", reply_markup=tg_keyboard.yes_or_no_keyboard())
         dbcon.insert_in_db(f"insert into operation_buffer values ({id}, {summ})")
 
     elif user_status == 96:
         if message.text == "Да":
             dbcon.add_money_to_user_from_buffer(message)
             dbcon.insert_in_db("delete from operation_buffer")
-            bot.send_message(message.from_user.id, f"Баланс успешно пополнен",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, f"Баланс успешно пополнен", reply_markup=tg_keyboard.admin_keyboard())
             dbcon.calc_balances()
             dbcon.set_status(message, 99)
 
         elif message.text == "Нет":
             dbcon.insert_in_db("delete from operation_buffer")
             dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Отмена",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, "Отмена", reply_markup=tg_keyboard.admin_keyboard())
 
         else:
             dbcon.insert_in_db("delete from operation_buffer")
             dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Не верный ответ",reply_markup=tg_keyboard.admin_keyboard())
+            bot.send_message(message.from_user.id, "Не верный ответ", reply_markup=tg_keyboard.admin_keyboard())
 
     else:
-        bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...",reply_markup=tg_keyboard.main_keyboard())
+        bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...", reply_markup=tg_keyboard.main_keyboard())
         dbcon.set_status(message, 20)
 
 
 # Handle all other messages with content_type 'text' (content_types defaults to ['text'])
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
-    bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help",reply_markup=tg_keyboard.main_keyboard())
+    bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help", reply_markup=tg_keyboard.main_keyboard())
     dbcon.set_status(message, 20)
 
 bot.infinity_polling()

@@ -1,11 +1,10 @@
 import psycopg2
-import config
 from datetime import datetime
 from calendar import monthrange
 import secrets
-import outline_api_reqests as outline
+from VPN_by_Prokin.commands import outline_api_reqests as outline
 import string
-
+from VPN_by_Prokin.app import config
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
