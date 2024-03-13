@@ -7,6 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ADD * /src/
 
-ADD run.sh /src/
+ADD run.sh /src/ --chmod=755
 
 CMD [ "./run.sh"]
