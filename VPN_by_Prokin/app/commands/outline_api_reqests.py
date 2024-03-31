@@ -1,4 +1,4 @@
-import config
+from app import config
 import requests
 import json
 from datetime import datetime

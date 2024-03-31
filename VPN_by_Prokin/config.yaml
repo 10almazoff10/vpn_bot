@@ -1,0 +1,16 @@
+---
+telegram:
+  api: "5779279148:AAGot2SPqlcKnT6qmTUcUnDFwMMR_ySbJ5Y"
+
+outline:
+  api: "https://95.169.181.151:34466/QJTInLnpDhvy4abdgS0aUQ/"
+
+database:
+  host: postgres
+  port: 5432
+  user: postgres
+  pass: GA9d0zuiCvno9Oy7zUPO
+  base_name: vpndb
+
+logs:
+  dir: /opt/logs

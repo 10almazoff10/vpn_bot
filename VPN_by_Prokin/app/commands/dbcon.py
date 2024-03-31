@@ -1,24 +1,28 @@
 import psycopg2
-import config
 from datetime import datetime
 from calendar import monthrange
 import secrets
-import outline_api_reqests as outline
+from app.commands import outline_api_reqests as outline
 import string
-
+from app import config
+from app.logs.logger import logger
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
 DB_PASS = config.DB_PASS
 DB_HOST = config.DB_HOST
 
+
+logger(f"{DB_HOST}, {DB_USER}, {DB_PASS}, {DB_NAME}")
+
 def select_from_db(req):
     try:
         # пытаемся подключиться к базе данных
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    except:
+    except Exception as error:
         # в случае сбоя подключения будет выведено сообщение в STDOUT
-        print('Can`t establish connection to database')
+        logger('Can`t establish connection to database')
+        logger(error)
     # получение объекта курсора
     cursor = conn.cursor()
     cursor.execute(req)
@@ -31,9 +35,10 @@ def select_many_from_db(req):
     try:
         # пытаемся подключиться к базе данных
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    except:
+    except Exception as error:
         # в случае сбоя подключения будет выведено сообщение в STDOUT
-        print('Can`t establish connection to database')
+        logger('Can`t establish connection to database')
+        logger(error)
     # получение объекта курсора
     cursor = conn.cursor()
     cursor.execute(req)
@@ -41,6 +46,7 @@ def select_many_from_db(req):
     cursor.close() # закрываем курсор
     conn.close() # закрываем соединение
     return result
+
 def insert_in_db(req):
     try:
         # пытаемся подключиться к базе данных

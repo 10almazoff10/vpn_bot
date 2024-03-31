@@ -1,7 +1,7 @@
 from datetime import datetime
+from app import config
 
-
-LOGS_DIR = "/opt/logs"
+LOGS_DIR = config.LOGS_DIR
 # Логгер для отладки
 def logger(logs):
     dt = datetime.now()
