@@ -9,7 +9,7 @@ database:
   host: postgres
   port: 5432
   user: postgres
-  pass: GA9d0zuiCvno9Oy7zUPO
+  pass: Ghj445544
   base_name: vpndb
 
 logs:
