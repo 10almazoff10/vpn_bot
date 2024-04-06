@@ -79,7 +79,11 @@ def convert_size(size_bytes):
    return "%s %s" % (s, size_name[i])
 
 def get_key_traffic():
-    data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
+    try: 
+        data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
+    except Exception as error:
+        logger(error)
+
     key_id = dbcon.get_list_keys()
     logger("Выполняется загрузка информации о трафике..")
 

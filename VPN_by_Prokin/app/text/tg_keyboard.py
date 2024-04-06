@@ -19,12 +19,11 @@ def admin_keyboard():
     button2 = telebot.types.KeyboardButton(text="Пополнить баланс пользователя")
     button3 = telebot.types.KeyboardButton(text="Написать сообщение пользователю")
     button4 = telebot.types.KeyboardButton(text="Выручка")
-    button5 = telebot.types.KeyboardButton(text="Управление ключами VPN")
     button6 = telebot.types.KeyboardButton(text="Логи")
     button_exit = telebot.types.KeyboardButton(text="Выход из админки")
     keyboard.add(button1, button2)
-    keyboard.add(button3, button4, button6)
-    keyboard.add(button5, button_exit)
+    keyboard.add(button4, button6)
+    keyboard.add(button3, button_exit)
     return keyboard
 
 def admin_keyboard_keys():
@@ -44,11 +43,9 @@ def num_keyboard():
     button1 = telebot.types.KeyboardButton(text="5")
     button2 = telebot.types.KeyboardButton(text="10")
     button3 = telebot.types.KeyboardButton(text="20")
-    button4 = telebot.types.KeyboardButton(text="50")
-    button_exit = telebot.types.KeyboardButton(text="100")
+    button4 = telebot.types.KeyboardButton(text="30")
     keyboard.add(button1, button2)
     keyboard.add(button3, button4)
-    keyboard.add(button_exit)
     return keyboard
 
 def yes_or_no_keyboard():

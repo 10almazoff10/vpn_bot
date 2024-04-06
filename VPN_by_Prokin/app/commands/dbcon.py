@@ -171,3 +171,5 @@ def add_money_to_user_from_buffer(message):
 def get_list_keys():
     return select_many_from_db(f"select key_id, user_name from users_vpn_keys order by key_id asc;")
 
+def get_user_telegram_id(id):
+    return select_from_db(f"select telegram_id from users where id = {id}")

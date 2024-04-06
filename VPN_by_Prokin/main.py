@@ -179,27 +179,13 @@ def status(message):
             money_last_mounth = dbcon.select_from_db("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
             bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
+        elif message.text == "Написать сообщение пользователю":
+            dbcon.set_status(message, 95)
+            bot.send_message(message.from_user.id, f"Введите ID клиента и cообщение")
+
+
         else:
             bot.send_message(message.from_user.id, f"Я вас не понял", reply_markup=tg_keyboard.admin_keyboard())
-
-    elif user_status >= 100 and user_status <= 110:
-
-        if message.text == "Список ключей":
-            pass
-        elif message.text == "Трафик по ключу":
-            pass
-        elif message.text == "Создать ключ":
-            pass
-        elif message.text == "Удалить ключ":
-            pass
-        
-        elif message.text == "Выход":
-            dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Переход в админ-панель", reply_markup=tg_keyboard.admin_keyboard())
-        else:
-            dbcon.set_status(message, 99)
-            bot.send_message(message.from_user.id, "Переход в админ-панель", reply_markup=tg_keyboard.admin_keyboard())
-
 
     elif user_status == 97:
         dbcon.set_status(message, 96)
@@ -226,6 +212,18 @@ def status(message):
             dbcon.insert_in_db("delete from operation_buffer")
             dbcon.set_status(message, 99)
             bot.send_message(message.from_user.id, "Не верный ответ", reply_markup=tg_keyboard.admin_keyboard())
+ 
+    elif user_status == 95:
+        id = message.text.split(" ")[0]
+        text_message = message.text.split(" ", 1)[1:][0]
+        try:
+            telegram_id = dbcon.get_user_telegram_id(id)[0]
+            bot.send_message(telegram_id, f"{text_message}")
+            bot.send_message(message.from_user.id, "Сообщение успешно отправлено!", reply_markup=tg_keyboard.admin_keyboard())
+            dbcon.set_status(message, 99)
+        except Exception as error:
+            bot.send_message(message.from_user.id, f"Не удалось получить telegram_id пользователя\n`{error}`", reply_markup=tg_keyboard.admin_keyboard())
+            dbcon.set_status(message, 99)
 
     else:
         bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...", reply_markup=tg_keyboard.main_keyboard())
