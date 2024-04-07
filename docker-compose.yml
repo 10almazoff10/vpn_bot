@@ -2,6 +2,20 @@
 version: '3'
 
 services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: work
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Ghj445544
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
   vpn_bot:
     # Сборка образа для сервиса из директории
     build: VPN_by_Prokin/
