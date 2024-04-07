@@ -1,0 +1,15 @@
+[Unit]
+Description=VPN-Bot
+After=syslog.target network.target 
+
+[Service]
+Type=forking
+User=root
+Group=root
+
+WorkingDirectory=/root/vpnbot/VPN_by_Prokin
+ExecStart=/root/vpnbot/VPN_by_Prokin/run.sh 
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
