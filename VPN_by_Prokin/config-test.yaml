@@ -10,7 +10,7 @@ database:
   port: 5432
   user: postgres
   pass: Ghj445544
-  base_name: work-test
+  base_name: work_test
 
 logs:
   dir: /tmp
