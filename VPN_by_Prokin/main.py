@@ -92,6 +92,10 @@ def status(message):
             dbcon.set_status(message, 40)
             bot.send_message(message.from_user.id, "Введите количество операций:", reply_markup=tg_keyboard.num_keyboard())
         
+        elif message.text == "Заработать":
+            dbcon.set_status(message, 60)
+            bot.send_message(message.from_user.id, "Переход...", reply_markup=tg_keyboard.make_money())
+        
         elif message.text == "Ключ VPN":
 
             if dbcon.get_user_balance(message) > -5:
@@ -147,6 +151,28 @@ def status(message):
         elif message.text == "Нет":
             bot.send_message(message.from_user.id, "Отмена...", reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, 20)
+
+    elif user_status == 60:
+        if message.text == "Реферальный код":
+            bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
+
+        elif message.text == "Задания":
+            bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
+
+        elif message.text == "Колесо фортуны":
+            bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
+
+        elif message.text == "Пост в соц.сети":
+            bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
+
+        elif message.text == "Вернуться":
+            bot.send_message(message.from_user.id, "Переход в главное меню", reply_markup=tg_keyboard.main_keyboard())
+            dbcon.set_status(message, 20)
+            
+        else:
+            dbcon.set_status(message, 20)
+            bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...", reply_markup=tg_keyboard.main_keyboard())
+            
 
 
     elif user_status == 99:

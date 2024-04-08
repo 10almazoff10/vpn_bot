@@ -8,9 +8,11 @@ def main_keyboard():
     button3 = telebot.types.KeyboardButton(text="Пополнить")
     button4 = telebot.types.KeyboardButton(text="Ключ VPN")
     button5 = telebot.types.KeyboardButton(text="Трафик")
+    button6 = telebot.types.KeyboardButton(text="Заработать")
     keyboard.add(button_support, button1)
     keyboard.add(button2, button3)
     keyboard.add(button4, button5)
+    keyboard.add(button6)
     return keyboard
 
 def admin_keyboard():
@@ -53,4 +55,16 @@ def yes_or_no_keyboard():
     button1 = telebot.types.KeyboardButton(text="Да")
     button2 = telebot.types.KeyboardButton(text="Нет")
     keyboard.add(button1, button2)
+    return keyboard
+
+def make_money():
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton(text="Реферальный код")
+    button2 = telebot.types.KeyboardButton(text="Задания")
+    button3 = telebot.types.KeyboardButton(text="Колесо фортуны")
+    button4 = telebot.types.KeyboardButton(text="Пост в соц.сети")
+    button5 = telebot.types.KeyboardButton(text="Вернуться")
+    keyboard.add(button1, button2)
+    keyboard.add(button3)
+    keyboard.add(button4) 
     return keyboard
