@@ -66,5 +66,5 @@ def make_money():
     button5 = telebot.types.KeyboardButton(text="Вернуться")
     keyboard.add(button1, button2)
     keyboard.add(button3)
-    keyboard.add(button4) 
+    keyboard.add(button4, button5) 
     return keyboard
