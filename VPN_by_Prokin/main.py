@@ -160,6 +160,11 @@ def status(message):
             bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
 
         elif message.text == "Колесо фортуны":
+            keyboard = telebot.types.InlineKeyboardMarkup()
+            url_button = telebot.types.InlineKeyboardButton(text="Крутить колесо", url="http://185.246.118.85")
+            keyboard.add(url_button)
+            bot.send_message(message.chat.id, "Крутить колесо!", reply_markup=keyboard)
+
             bot.send_message(message.from_user.id, "В разработке", reply_markup=tg_keyboard.make_money())
 
         elif message.text == "Пост в соц.сети":
