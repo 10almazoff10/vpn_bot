@@ -13,8 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+
 
   vpn_bot:
     # Сборка образа для сервиса из директории
@@ -27,6 +26,9 @@ volumes:
     networks:
       - proxynet
 
+volumes:
+  postgres_data:
+  
 networks:
   proxynet:
     name: vpn_bot_default
