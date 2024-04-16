@@ -7,7 +7,7 @@ pipeline {
       steps {
 
         echo 'Create build archive'
-        sh 'ssh vpn-bot cd vpnbot-test && git pull'
+        sh 'ssh vpn-bot cd vpnbot-test/vpn_bot && git pull'
         
       }
     }
