@@ -3,11 +3,19 @@
 pipeline {
   agent any
   stages {
-    stage('Stage 1') {
+    stage('Build') {
       steps {
-        sh 'ls'
-        sh 'ssh vpn-bot ip a'
+
+        echo 'Create build archive'
+        sh 'ssh vpn-bot cd vpnbot-test && git pull'
         
+      }
+    }
+    stage('Deploy'){
+      steps {
+        echo 'Send files to server'
+        sh 'ssh vpn-bot systemctl restart vpn-bot-test'
+
       }
     }
   }
