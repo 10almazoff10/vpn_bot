@@ -6,6 +6,8 @@ pipeline {
     stage('Stage 1') {
       steps {
         sh 'ls'
+        sh 'ssh vpn-bot ip a'
+        
       }
     }
   }
