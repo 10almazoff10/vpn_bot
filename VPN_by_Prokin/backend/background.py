@@ -10,7 +10,7 @@ import time
 from app.logs.logger import logger
 
 
-VERSION = "1.0.3 - 2024.03.13"
+VERSION = "1.0.5 - 2024.04.16"
 
 PRICE_PER_MOUNTH = 75
 

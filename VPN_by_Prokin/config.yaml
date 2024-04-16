@@ -13,4 +13,4 @@ database:
   base_name: work_test
 
 logs:
-  dir: /tmp
+  dir: /tmp/test
