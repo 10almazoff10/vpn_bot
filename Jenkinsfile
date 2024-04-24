@@ -10,8 +10,7 @@ pipeline {
         sh 'chmod +x build.sh'
         sh './build.sh'
         sh 'pwd'
-        sh 'ssh vpn-bot rm -f ~/vpnbot-test/vpn-bot-develop'
-        sh 'scp ./VPN_by_Prokin/dist/vpn-bot-develop vpn-bot:~/vpnbot-test/'
+        sh 'scp ./VPN_by_Prokin/dist/vpn-bot-develop vpn-bot:/root/vpnbot-test/'
         
       }
     }
