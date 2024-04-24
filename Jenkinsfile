@@ -7,7 +7,8 @@ pipeline {
       steps {
 
         echo 'Create build archive'
-        sh 'ssh vpn-bot "cd vpnbot-test/vpn_bot && git pull"'
+        sh './build.sh'
+        sh 'scp VPN_by_Prokin/dist/vpn-bot-develop vpn-bot:~/vpnbot-test/'
         
       }
     }
