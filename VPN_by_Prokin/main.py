@@ -206,8 +206,8 @@ def status(message):
             bot.send_document(message.from_user.id, file)
         
         elif message.text == "Выручка":
-            money_all = dbcon.select_from_db("select sum(summ) from operations where type = 2")[0]
-            money_last_mounth = dbcon.select_from_db("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
+            money_all = dbcon.execute_query("select sum(summ) from operations where type = 2")[0]
+            money_last_mounth = dbcon.execute_query("select sum(summ) from operations where type = 2 and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
             bot.send_message(message.from_user.id,f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
         elif message.text == "Написать сообщение пользователю":
