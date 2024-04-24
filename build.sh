@@ -1,5 +1,6 @@
 #!/bin/bash
 cd VPN_by_Prokin
+pip install -r requirements.txt
 
 pyinstaller --paths . \
             --name vpn-bot-develop \
