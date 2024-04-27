@@ -53,11 +53,21 @@ def insert_in_db(req):
 def add_new_user(message):
     telegram_id = message.from_user.id
     name = message.from_user.first_name
+    if len(name) < 15 and is_good_string(name):
+        pass
+    else:
+        name = "Пользователь"
+
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     status = 10
     insert_in_db(f"INSERT INTO users (telegram_id, name, date_first_enter, status) VALUES ({telegram_id}, '{name}','{date}', {status})")
     insert_in_db(f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
+
+def is_good_string(text):
+    # Проверяем, что строка состоит только из русских и английских букв, символов и цифр
+    allowed_characters = string.ascii_letters + string.digits + "-_., "
+    return all(char in allowed_characters for char in text)
 
 
 def check_user_indb(message):
