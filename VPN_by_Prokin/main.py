@@ -142,7 +142,15 @@ def status(message):
                          reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == 40:
-        operationsCount = message.text
+        try:
+            if len(message.text) < 5:
+                operationsCount = int(message.text)
+                if operationsCount > 30:
+                    operationsCount = 31
+        except Exception as error:
+            bot.send_message(758952233, f"Пользователь некорректно ввел количество операций\nПользователь: {message.from_user.id}\nТекст сообщения: {message.text}")
+            bot.send_message(message.from_user.id, "Введено неверное количество операций")
+
         if int(operationsCount) <= 30 and int(operationsCount) > 0:
             operations_list = dbcon.get_operations_user(message, message.text)
             operations = str()
