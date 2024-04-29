@@ -1,13 +1,13 @@
 from datetime import datetime
 from calendar import monthrange
-from app.commands import dbcon
-from app.commands import outline_api_reqests
-from app import config
+from botApp.commands import dbcon
+from botApp.commands import outline_api_reqests
+from botApp import config
 import telebot
 import math
 import schedule
 import time
-from app.logs.logger import logger
+from botApp.logs.logger import logger
 
 
 VERSION = "1.2.2 - 2024.04.29"
