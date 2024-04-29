@@ -3,10 +3,10 @@ from contextlib import closing
 from datetime import datetime
 from calendar import monthrange
 import secrets
-from app.commands import outline_api_reqests as outline
+from botApp.commands import outline_api_reqests as outline
 import string
-from app import config
-from app.logs.logger import logger
+from botApp import config
+from botApp.logs.logger import logger
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER

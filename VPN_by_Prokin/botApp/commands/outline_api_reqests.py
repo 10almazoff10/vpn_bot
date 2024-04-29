@@ -1,4 +1,4 @@
-from app import config
+from botApp import config
 import requests
 import json
 from datetime import datetime

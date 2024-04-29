@@ -2,10 +2,10 @@
 
 import telebot
 from threading import Thread
-from app.text import tg_keyboard, messages
-from app.commands import dbcon
-from app.logs import logger
-from app import config
+from botApp.text import tg_keyboard, messages
+from botApp.commands import dbcon
+from botApp.logs import logger
+from botApp import config
 from backend import background
 
 # Run Backend
@@ -93,7 +93,7 @@ def status(message):
 
         elif message.text == "Трафик":
             traffic = dbcon.get_user_traffic(message)
-            bot.send_message(message.from_user.id, f"За последние 30 дней загружено {traffic}", parse_mode="MARKDOWN")
+            bot.send_message(message.from_user.id, f"За последние 30 дней загружено `{traffic[0]}`", parse_mode="MARKDOWN")
 
         elif message.text == "Последние операции":
             dbcon.set_status(message, 40)
@@ -143,12 +143,19 @@ def status(message):
                          reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == 40:
-        operations_list = dbcon.get_operations_user(message, message.text)
-        operations = str()
-        for operation in operations_list:
-            operations = operations + f"-----------\nID операции: {operation[0]}\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n"
-        bot.send_message(message.from_user.id, operations, parse_mode='html', reply_markup=tg_keyboard.main_keyboard())
-        dbcon.set_status(message, 20)
+        operationsCount = message.text
+        if int(operationsCount) <= 30:
+            operations_list = dbcon.get_operations_user(message, message.text)
+            operations = str()
+            for operation in operations_list:
+                operations = operations + f"-----------\nID операции: {operation[0]}\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n"
+            bot.send_message(message.from_user.id, operations, parse_mode='html', reply_markup=tg_keyboard.main_keyboard())
+            dbcon.set_status(message, 20)
+
+        elif int(operationsCount) > 30 or int(operationsCount) < 0:
+            bot.send_message(message.from_user.id, messages.maxOperations,
+                             reply_markup=tg_keyboard.main_keyboard())
+            dbcon.set_status(message, 20)
 
     elif user_status == 51:
         if message.text == "Да":

@@ -21,3 +21,5 @@ Android: https://play.google.com/store/apps/details?id=org.outline.android.clien
 
 Ключ будет активен до тех пор, пока баланс будет больше -5 рублей.
 """
+
+maxOperations = "Я могу отправить только до 30 последних операций, если нужно больше, то оставьте заявку в поддержку."
