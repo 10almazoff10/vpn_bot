@@ -156,6 +156,11 @@ def status(message):
                              reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, 20)
 
+        else:
+            bot.send_message(message.from_user.id, messages.notUnderstand,
+                             reply_markup=tg_keyboard.main_keyboard())
+            dbcon.set_status(message, 20)
+
     elif user_status == 51:
         if message.text == "Да":
             bot.send_message(message.from_user.id, "Выполняется регистрация нового ключа...")

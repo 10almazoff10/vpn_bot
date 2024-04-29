@@ -23,3 +23,4 @@ Android: https://play.google.com/store/apps/details?id=org.outline.android.clien
 """
 
 maxOperations = "Я могу отправить только до 30 последних операций, если нужно больше, то оставьте заявку в поддержку."
+notUnderstand = "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню..."
