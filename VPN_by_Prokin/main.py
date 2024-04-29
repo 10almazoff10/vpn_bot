@@ -85,7 +85,7 @@ def status(message):
 
         elif message.text == "Написать в поддержку":
             dbcon.set_status(message, 30)
-            bot.send_message(message.from_user.id, "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов")
+            bot.send_message(message.from_user.id, "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов", reply_markup=telebot.types.ReplyKeyboardRemove())
 
         elif message.text == "Пополнить":
             bot.send_message(message.from_user.id, "СБП `+79635122453` Тинькофф🙂", parse_mode="MARKDOWN")
