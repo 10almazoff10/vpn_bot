@@ -283,11 +283,11 @@ def status(message):
     elif user_status == 96:
         if message.text == "Да":
             dbcon.add_money_to_user_from_buffer(message)
+            creds = dbcon.execute_query("select * from operation_buffer")
             dbcon.insert_in_db("delete from operation_buffer")
             bot.send_message(message.from_user.id, f"Баланс успешно пополнен",
                              reply_markup=tg_keyboard.admin_keyboard())
             dbcon.calc_balances()
-            creds = dbcon.execute_query("select * from operation_buffer")
 
             try:
                 telegram_id = dbcon.get_user_telegram_id(creds[0])[0]
