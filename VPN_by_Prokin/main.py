@@ -150,12 +150,14 @@ def status(message):
             else:
                 bot.send_message(758952233,
                                  f"Пользователь некорректно ввел количество операций\nПользователь: {message.from_user.id}\nТекст сообщения: {message.text}")
-                bot.send_message(message.from_user.id, "Введено неверное количество операций")
+                bot.send_message(message.from_user.id, "Введено неверное количество операций",
+                             reply_markup=tg_keyboard.num_keyboard())
         except Exception as error:
             bot.send_message(758952233,
                              f"Пользователь некорректно ввел количество операций\nПользователь: {message.from_user.id}\nТекст сообщения: {message.text}")
             bot.send_message(message.from_user.id,
-                             "Введено неверное количество операций")
+                             "Введено неверное количество операций",
+                             reply_markup=tg_keyboard.num_keyboard())
 
         if int(operationsCount) <= 30 and int(operationsCount) > 0:
             operations_list = dbcon.get_operations_user(message, message.text)
