@@ -256,6 +256,18 @@ def status(message):
             bot.send_message(message.from_user.id, f"Баланс успешно пополнен",
                              reply_markup=tg_keyboard.admin_keyboard())
             dbcon.calc_balances()
+            creds = dbcon.execute_query("select * from operation_buffer")
+
+            try:
+                telegram_id = dbcon.get_user_telegram_id(creds[0])[0]
+                bot.send_message(telegram_id, f"Ваш баланс пополнен на {creds[1][0]} руб.\nБлагодарим за сотрудничество!")
+                bot.send_message(message.from_user.id, "Сообщение успешно отправлено!",
+                                 reply_markup=tg_keyboard.admin_keyboard())
+                dbcon.set_status(message, 99)
+            except Exception as error:
+                bot.send_message(message.from_user.id, f"Не удалось получить telegram_id пользователя\n`{error}`",
+                                 reply_markup=tg_keyboard.admin_keyboard())
+                dbcon.set_status(message, 99)
             dbcon.set_status(message, 99)
 
         elif message.text == "Нет":

@@ -171,4 +171,12 @@ def get_list_keys():
     return execute_query(f"select key_id, user_name from users_vpn_keys order by key_id asc;",fetch_one=False)
 
 def get_user_telegram_id(id):
+    """
+    Функция для получения telegram-id пользователя по его id в БД
+    Args:
+        id: внутренний id пользователя
+
+    Returns:
+        telegram-id
+    """
     return execute_query(f"select telegram_id from users where id = {id}")
