@@ -143,7 +143,7 @@ def status(message):
 
     elif user_status == 40:
         operationsCount = message.text
-        if int(operationsCount) <= 30:
+        if int(operationsCount) <= 30 and int(operationsCount) > 0:
             operations_list = dbcon.get_operations_user(message, message.text)
             operations = str()
             for operation in operations_list:
