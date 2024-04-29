@@ -85,7 +85,7 @@ def status(message):
 
         elif message.text == "Написать в поддержку":
             dbcon.set_status(message, 30)
-            bot.send_message(message.from_user.id, "Напишите Ваше сообщение")
+            bot.send_message(message.from_user.id, "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов")
 
         elif message.text == "Пополнить":
             bot.send_message(message.from_user.id, "СБП `+79635122453` Тинькофф🙂", parse_mode="MARKDOWN")
@@ -135,11 +135,15 @@ def status(message):
                              reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == 30:
-        task_id = dbcon.create_support_task(message)
-        bot.send_message(758952233, f"Пользователь {message.from_user.id} оставил сообщение:\n{message.text}")
-        dbcon.set_status(message, 20)
-        bot.send_message(message.from_user.id, f"Ваше обращение № {task_id} зарегистрировано.",
-                         reply_markup=tg_keyboard.main_keyboard())
+        if len(message.text) < 100:
+            task_id = dbcon.create_support_task(message)
+            bot.send_message(758952233, f"Пользователь {message.from_user.id} оставил сообщение:\n{message.text}")
+            dbcon.set_status(message, 20)
+            bot.send_message(message.from_user.id, f"Ваше обращение № {task_id} зарегистрировано.",
+                           reply_markup=tg_keyboard.main_keyboard())
+        else:
+            bot.send_message(message.from_user.id, "Максимальная длина сообщения 100 символов.")
+            dbcon.set_status(message, 20)
 
     elif user_status == 40:
         try:
