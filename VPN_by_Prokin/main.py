@@ -16,7 +16,6 @@ API_TOKEN = config.API_KEY
 
 bot = telebot.TeleBot(API_TOKEN)
 
-
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     logger.logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
@@ -314,5 +313,5 @@ def echo_message(message):
                      reply_markup=tg_keyboard.main_keyboard())
     dbcon.set_status(message, 20)
 
-
+logger.logger("Запуск бота...")
 bot.infinity_polling()
