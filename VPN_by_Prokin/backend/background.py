@@ -53,9 +53,10 @@ def send_give_price():
 
         elif float(user[1]) < -5:
             id = user[2]
+            telegram_id = user[0]
             outline_api_reqests.remove_key(id)
             dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
-            dbcon.insert_in_db(f"update users set user_state = 1 where key_id = '{id}';")
+            dbcon.insert_in_db(f"update users set user_state = 1 where telegram_id = '{telegram_id}';")
             bot.send_message(758952233, f"Удаляю пользователя {user[0]}")
             try:
                 bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.")
