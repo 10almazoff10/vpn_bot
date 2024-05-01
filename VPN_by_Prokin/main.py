@@ -232,10 +232,20 @@ def status(message):
     elif user_status == 99:
         if message.text == "Список пользователей":
             users_list = dbcon.get_list_users()
-            users = str()
+            active = str()
+            disabled_users = str()
+            active_count = 0
+            disabled_count = 0
             for user in users_list:
-                users = users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n---------\n"
-            bot.send_message(message.from_user.id, users, parse_mode="MARKDOWN")
+                if user[4] == 0:
+                    active_count += 1
+                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
+                else:
+                    disabled_count += 1
+                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
+
+            message_with_users = f"""Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled_users}"""
+            bot.send_message(message.from_user.id, message_with_users, parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
             dbcon.set_status(message, 20)

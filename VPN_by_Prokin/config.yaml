@@ -6,7 +6,7 @@ outline:
   api: "https://95.169.181.151:34466/QJTInLnpDhvy4abdgS0aUQ/"
 
 database:
-  host: 127.0.0.1
+  host: 192.168.0.194
   port: 5432
   user: postgres
   pass: Ghj445544

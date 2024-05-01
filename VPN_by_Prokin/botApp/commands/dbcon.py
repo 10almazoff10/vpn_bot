@@ -159,7 +159,7 @@ def create_new_key(message):
 ########### ADMIN ############
 
 def get_list_users():
-    return execute_query(f"select name, telegram_id, balance, id from users ORDER BY id ASC",fetch_one=False)
+    return execute_query(f"select name, telegram_id, balance, id, user_state from users ORDER BY id ASC",fetch_one=False)
 
 
 def add_money_to_user_from_buffer(message):
