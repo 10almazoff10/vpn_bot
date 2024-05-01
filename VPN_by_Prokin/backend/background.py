@@ -1,16 +1,16 @@
 from datetime import datetime
 from calendar import monthrange
-from app.commands import dbcon
-from app.commands import outline_api_reqests
-from app import config
+from botApp.commands import dbcon
+from botApp.commands import outline_api_reqests
+from botApp import config
 import telebot
 import math
 import schedule
 import time
-from app.logs.logger import logger
+from botApp.logs.logger import logger
 
 
-VERSION = "1.0.3 - 2024.03.13"
+VERSION = "1.2.3 - 2024.05.01 - develop"
 
 PRICE_PER_MOUNTH = 75
 
@@ -38,10 +38,10 @@ def one_day_using():
 
 
 def send_give_price():
-    users_balance = dbcon.select_many_from_db("""select U.telegram_id, U.balance, V.key_id 
+    users_balance = dbcon.execute_query("""select U.telegram_id, U.balance, V.key_id 
                                                     FROM users AS U 
                                                     JOIN users_vpn_keys AS V 
-                                                    ON V.user_name = U.telegram_id;""")
+                                                    ON V.user_name = U.telegram_id;""", False)
     for user in users_balance:
         if float(user[1]) < 10 and float(user[1]) > -5:
             bot.send_message(758952233, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
@@ -53,15 +53,16 @@ def send_give_price():
 
         elif float(user[1]) < -5:
             id = user[2]
+            telegram_id = user[0]
             outline_api_reqests.remove_key(id)
             dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
-
+            dbcon.insert_in_db(f"update users set user_state = 1 where telegram_id = '{telegram_id}';")
             bot.send_message(758952233, f"Удаляю пользователя {user[0]}")
             try:
-                bot.send_message(user[0], f"""Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.""")
+                bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.")
                 bot.send_message(758952233, f"Пользователь удален {user[0]}")
-            except:
-                bot.send_message(758952233, f"Ошибка удаления пользователя {user[0]}")
+            except Exception as error:
+                bot.send_message(758952233, f"Ошибка удаления пользователя {user[0]}\n{error}")
             
 def update_balance():    
     dbcon.calc_balances()

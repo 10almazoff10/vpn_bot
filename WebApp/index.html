@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Веб-страница с монетой</title>
+<style>
+  body {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7; /* Здесь можно задать цвет фона или добавить изображение */
+    font-family: Arial, sans-serif;
+  }
+  .balance {
+    margin-top: 20px;
+    font-size: 24px;
+  }
+  .coin-button {
+    display: inline-block;
+    margin-top: 50px;
+    width: 150px; /* Размер монеты */
+    height: 150px; /* Размер монеты */
+    background: url('img/coin.png') no-repeat center center; /* Путь к изображению монеты */
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="balance">Баланс: 1000₽</div>
+<button class="coin-button" onclick="alert('Кнопка нажата!')"></button>
+
+<script>
+// Здесь можно добавить JavaScript для обработки кликов и других действий
+</script>
+
+</body>
+</html>

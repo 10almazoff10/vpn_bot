@@ -1,6 +1,6 @@
 ---
 telegram:
-  api: "6577838059:AAHYKrSVEPZVg9DKHEBEO9lWT_DBznUNeqc"
+  api: "5779279148:AAGot2SPqlcKnT6qmTUcUnDFwMMR_ySbJ5Y"
 
 outline:
   api: "https://95.169.181.151:34466/QJTInLnpDhvy4abdgS0aUQ/"
@@ -10,7 +10,7 @@ database:
   port: 5432
   user: postgres
   pass: Ghj445544
-  base_name: work_test
+  base_name: work
 
 logs:
   dir: /tmp

@@ -1,5 +1,5 @@
 from datetime import datetime
-from app import config
+from botApp import config
 
 LOGS_DIR = config.LOGS_DIR
 # Логгер для отладки
