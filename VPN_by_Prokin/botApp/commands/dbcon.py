@@ -186,7 +186,7 @@ def get_list_users():
                                        user_state,
                                        keys.traffic
                                 FROM   users
-                                       join users_vpn_keys AS keys
+                                       left join users_vpn_keys AS keys
                                          ON keys.user_name = users.telegram_id
                                 ORDER  BY id ASC;""",
                          fetch_one=False)

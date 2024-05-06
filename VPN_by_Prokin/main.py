@@ -240,7 +240,8 @@ def status(message):
             disabled_count = 0
             for user in users_list:
                 traffic = user[5]
-                print(len(users_list))
+                if traffic == None:
+                    traffic = "нет ключа"
                 if user[4] == 0:
                     active_count += 1
                     active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб. {traffic}\n"

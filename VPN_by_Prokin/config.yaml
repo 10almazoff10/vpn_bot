@@ -13,4 +13,4 @@ database:
   base_name: work_test
 
 logs:
-  dir: C:\Users\10alm\PycharmProjects\vpn_bot_develop
+  dir: /tmp
