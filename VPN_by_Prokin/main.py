@@ -239,12 +239,13 @@ def status(message):
             active_count = 0
             disabled_count = 0
             for user in users_list:
+                traffic = user[5]
                 if user[4] == 0:
                     active_count += 1
-                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
+                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб. {traffic}\n"
                 else:
                     disabled_count += 1
-                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
+                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб. {traffic}\n"
 
             message_with_users = f"""Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled_users}"""
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")

@@ -174,7 +174,21 @@ def create_new_key(message):
 ########### ADMIN ############
 
 def get_list_users():
-    return execute_query(f"select name, telegram_id, balance, id, user_state from users ORDER BY id ASC",
+    """
+    Получение информации о пользователях
+    Returns:
+    Возвращает список пользователей и их трафик
+    """
+    return execute_query("""SELECT name,
+                                       telegram_id,
+                                       balance,
+                                       id,
+                                       user_state,
+                                       keys.traffic
+                                FROM   users
+                                       join users_vpn_keys AS keys
+                                         ON keys.user_name = users.telegram_id
+                                ORDER  BY id ASC;""",
                          fetch_one=False)
 
 
