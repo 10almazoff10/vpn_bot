@@ -90,7 +90,8 @@ def status(message):
             bot.send_message(sender_telegram_id, "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов", reply_markup=telebot.types.ReplyKeyboardRemove())
 
         elif message.text == "Пополнить":
-            bot.send_message(sender_telegram_id, "СБП `+79635122453` Тинькофф🙂", parse_mode="MARKDOWN")
+            user_id = dbcon.get_user_id(sender_telegram_id)
+            bot.send_message(sender_telegram_id, f"СБП `+79635122453` Тинькофф🙂\nВ комментарии к платежу пожалуйста укажите - `{user_id}`", parse_mode="MARKDOWN")
 
         elif message.text == "Трафик":
             traffic = dbcon.get_user_traffic(message)

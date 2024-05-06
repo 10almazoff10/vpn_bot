@@ -68,7 +68,16 @@ def add_new_user(message):
     insert_in_db(
         f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
 
+def get_user_id(telegram_id):
+    """
+    Получение внутреннего id пользователя
+    Args:
+        telegram_id:
 
+    Returns:
+    id_user
+    """
+    return execute_query(f"select id from users where telegram_id = '{telegram_id}';")[0]
 def is_good_string(text):
     # Проверяем, что строка состоит только из русских и английских букв, символов и цифр
     allowed_characters = string.ascii_letters + string.digits + "-_., "
