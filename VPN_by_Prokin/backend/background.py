@@ -10,7 +10,7 @@ import time
 from botApp.logs.logger import logger
 
 
-VERSION = "1.2.3 - 2024.05.01 - develop"
+VERSION = "1.2.3 - 2024.05.01 - prod"
 
 PRICE_PER_MOUNTH = 75
 
