@@ -51,7 +51,7 @@ def send_give_price():
             except :
                 bot.send_message(758952233, f"Не удалось отправить...")
 
-        elif float(user[1]) < -5:
+        elif float(user[1]) <= -5:
             id = user[2]
             telegram_id = user[0]
             outline_api_reqests.remove_key(id)
