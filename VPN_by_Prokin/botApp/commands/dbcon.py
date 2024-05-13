@@ -207,6 +207,12 @@ def add_money_to_user_from_buffer(message):
     insert_in_db(
         f"insert into operations (summ, type, operation_date, user_id) values ((select summ from operation_buffer), 2, '{date}', (select user_id from operation_buffer))")
 
+def add_money_to_user_from_pay_form(telegram_id, summ):
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
+    insert_in_db(
+        f"insert into operations (summ, type, operation_date, user_id) values ({summ}, 2, '{date}', (select id from users where telegram_id = '{telegram_id}'))")
+
 
 def get_list_keys():
     return execute_query(f"select key_id, user_name from users_vpn_keys order by key_id asc;", fetch_one=False)

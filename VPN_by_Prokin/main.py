@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 import telebot
+from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
 from botApp.logs import logger
 from botApp import config
 from backend import background
+
 
 # Run Backend
 backend = Thread(target=background.run_backend)
@@ -15,6 +17,23 @@ backend.start()
 API_TOKEN = config.API_KEY
 
 bot = telebot.TeleBot(API_TOKEN)
+
+### Payment data
+
+provider_token = '381764678:TEST:84608'
+
+# More about Payments: https://core.telegram.org/bots/payments
+
+prices_1 = [LabeledPrice(label='Доступ на 1 месяц', amount=7500)]
+prices_2 = [LabeledPrice(label='Доступ на 3 месяца', amount=22500)]
+prices_3 = [LabeledPrice(label='Доступ на 6 месяцев', amount=40500)]
+shipping_options = [
+    ShippingOption(id='instant', title='WorldWide Teleporter').add_price(LabeledPrice('Teleporter', 1000)),
+    ShippingOption(id='pickup', title='Local pickup').add_price(LabeledPrice('Pickup', 300))]
+
+
+
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -91,7 +110,36 @@ def status(message):
 
         elif message.text == "Пополнить":
             user_id = dbcon.get_user_id(sender_telegram_id)
-            bot.send_message(sender_telegram_id, f"СБП `+79635122453` Тинькофф🙂\nВ комментарии к платежу пожалуйста укажите - `{user_id}`", parse_mode="MARKDOWN")
+            #bot.send_message(sender_telegram_id, f"СБП `+79635122453` Тинькофф🙂\nВ комментарии к платежу пожалуйста укажите - `{user_id}`", parse_mode="MARKDOWN")
+
+            bot.send_message(message.chat.id,
+                             "Переход к форме оплаты...", parse_mode='Markdown')
+
+            bot.send_invoice(message.chat.id,  # chat_id
+                'Доступ к VPN на 1 месяц',  # title
+                ' Самый быстрый VPN сервер',  # description
+                '00001',  # invoice_payload
+                provider_token,  # provider_token
+                'RUB',  # currency
+                prices_1, )
+
+            bot.send_invoice(
+                message.chat.id,  # chat_id
+                'Доступ к VPN на 3 месяца',  # title
+                '3 месяца доступа к лучшему VPN',  # description
+                '00001',  # invoice_payload
+                provider_token,  # provider_token
+                'RUB',  # currency
+                prices_2, )
+
+            bot.send_invoice(
+                message.chat.id,  # chat_id
+                'Доступ к VPN на 6 месяцев',  # title
+                ' Скидка 10%',  # description
+                '00001',  # invoice_payload
+                provider_token,  # provider_token
+                'RUB',  # currency
+                prices_3, )
 
         elif message.text == "Трафик":
             traffic = dbcon.get_user_traffic(message)
@@ -355,11 +403,46 @@ def status(message):
 
 
 # Handle all other messages with content_type 'text' (content_types defaults to ['text'])
+
+@bot.shipping_query_handler(func=lambda query: True)
+def shipping(shipping_query):
+    print(shipping_query)
+    bot.answer_shipping_query(shipping_query.id, ok=True, shipping_options=shipping_options,
+                              error_message='Oh, seems like our Dog couriers are having a lunch right now. Try again later!')
+
+
+@bot.pre_checkout_query_handler(func=lambda query: True)
+def checkout(pre_checkout_query):
+    bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True,
+                                  error_message="Aliens tried to steal your card's CVV, but we successfully protected your credentials,"
+                                                " try to pay again in a few minutes, we need a small rest.")
+
+
+@bot.message_handler(content_types=['successful_payment'])
+def got_payment(message):
+    telegram_id = message.from_user.id
+    summ = message.successful_payment.total_amount / 100
+    try:
+        dbcon.add_money_to_user_from_pay_form(telegram_id, summ)
+        bot.send_message(message.chat.id,
+                         'Платеж успешно зачислен на ваш счет в размере `{} {}`'.format(
+                             message.successful_payment.total_amount / 100, message.successful_payment.currency),
+                         parse_mode='Markdown')
+    except Exception as error:
+        logger.logger(f"Ошибка при оплате\n{error}")
+        bot.send_message(758952233, f'Не удалось зачислить платеж пользователя {telegram_id} на сумму {summ}')
+        bot.send_message(message.chat.id,
+                         'Ошибка платежа, информация передана разработчикам, в ближайшее время деньги будут зачислены в размере `{} {}`'.format(
+                             message.successful_payment.total_amount / 100, message.successful_payment.currency),
+                         parse_mode='Markdown')
+
+
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     bot.send_message(message.from_user.id, "Не понял Вас, воспользуйтесь /help",
                      reply_markup=tg_keyboard.main_keyboard())
     dbcon.set_status(message, 20)
+
 
 logger.logger("Запуск бота...")
 bot.infinity_polling()
