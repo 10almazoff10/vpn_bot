@@ -6,6 +6,7 @@ with open('./config.yaml', 'r') as file:
 
 API_KEY = cfg_file["telegram"]["api"]
 OUTLINE_API_KEY = cfg_file["outline"]["api"]
+PROVIDER_TOKEN = cfg_file["providers"]["yookassa"]
 
 database = cfg_file["database"]
 

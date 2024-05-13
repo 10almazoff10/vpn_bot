@@ -20,7 +20,7 @@ bot = telebot.TeleBot(API_TOKEN)
 
 ### Payment data
 
-provider_token = '381764678:TEST:84608'
+provider_token = config.PROVIDER_TOKEN
 
 # More about Payments: https://core.telegram.org/bots/payments
 
