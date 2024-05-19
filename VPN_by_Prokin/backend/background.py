@@ -10,12 +10,15 @@ import time
 from botApp.logs.logger import logger
 
 
-VERSION = "1.2.4 - 2024.05.06"
+VERSION = "1.3.1 - 2024.05.20"
 
 PRICE_PER_MOUNTH = 75
 
 API_TOKEN = config.API_KEY
 bot = telebot.TeleBot(API_TOKEN)
+
+###Admin
+ADMIN_ID = config.ADMIN_ID
 
 def days_in_mounth():
     current_year = datetime.now().year
@@ -44,12 +47,12 @@ def send_give_price():
                                                     ON V.user_name = U.telegram_id;""", False)
     for user in users_balance:
         if float(user[1]) < 10 and float(user[1]) > -5:
-            bot.send_message(758952233, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
+            bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
             try:
                 bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
-                bot.send_message(758952233, f"Успешно отправлено")
+                bot.send_message(ADMIN_ID, f"Успешно отправлено")
             except :
-                bot.send_message(758952233, f"Не удалось отправить...")
+                bot.send_message(ADMIN_ID, f"Не удалось отправить...")
 
         elif float(user[1]) <= -5:
             id = user[2]
@@ -57,12 +60,12 @@ def send_give_price():
             outline_api_reqests.remove_key(id)
             dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
             dbcon.insert_in_db(f"update users set user_state = 1 where telegram_id = '{telegram_id}';")
-            bot.send_message(758952233, f"Удаляю пользователя {user[0]}")
+            bot.send_message(ADMIN_ID, f"Удаляю пользователя {user[0]}")
             try:
                 bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.")
-                bot.send_message(758952233, f"Пользователь удален {user[0]}")
+                bot.send_message(ADMIN_ID, f"Пользователь удален {user[0]}")
             except Exception as error:
-                bot.send_message(758952233, f"Ошибка удаления пользователя {user[0]}\n{error}")
+                bot.send_message(ADMIN_ID, f"Ошибка удаления пользователя {user[0]}\n{error}")
             
 def update_balance():    
     dbcon.calc_balances()
@@ -107,7 +110,7 @@ def run_backend():
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     get_key_traffic()
     logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
-    bot.send_message(758952233, f"Сервер запущен - {date}\nВерсия - {VERSION}")
+    bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}")
 
     while True:
         schedule.run_pending()

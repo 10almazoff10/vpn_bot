@@ -1,6 +1,7 @@
 ---
 telegram:
   api: "5779279148:AAGot2SPqlcKnT6qmTUcUnDFwMMR_ySbJ5Y"
+  admin_id: 758952233
 
 outline:
   api: "https://95.169.181.151:34466/QJTInLnpDhvy4abdgS0aUQ/"
