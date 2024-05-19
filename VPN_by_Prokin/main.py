@@ -235,7 +235,8 @@ def status(message):
             operations_list = dbcon.get_operations_user(message, message.text)
             operations = str()
             for operation in operations_list:
-                operations = operations + f"-----------\nID операции: `{operation[0]}`\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n"
+                operations = operations + f"ID операции: `{operation[0]}`\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n\n"
+
             bot.send_message(sender_telegram_id, operations, parse_mode='MARKDOWN', reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, MAIN_MENU)
 
