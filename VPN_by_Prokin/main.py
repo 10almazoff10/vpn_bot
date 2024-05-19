@@ -127,6 +127,7 @@ def status(message):
         elif message.text == "Пополнить":
             user_id = dbcon.get_user_id(sender_telegram_id)
             #bot.send_message(sender_telegram_id, f"СБП `+79635122453` Тинькофф🙂\nВ комментарии к платежу пожалуйста укажите - `{user_id}`", parse_mode="MARKDOWN")
+            logger.logger(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(message.chat.id,
                              "Переход к форме оплаты...", parse_mode='Markdown')
