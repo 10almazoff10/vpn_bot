@@ -1,3 +1,5 @@
+import sys
+
 import psycopg2
 from contextlib import closing
 from datetime import datetime
@@ -12,8 +14,19 @@ DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
 DB_PASS = config.DB_PASS
 DB_HOST = config.DB_HOST
+DB_PORT = config.DB_PORT
 
-logger(f"{DB_HOST}, {DB_USER}, {DB_PASS}, {DB_NAME}")
+logger(f"Инициализация подключения к БД...")
+logger(f"{DB_HOST}, {DB_USER}, {DB_NAME}")
+
+### Статусы оплаты
+# 1	"Списание"
+# 2	"Пополнение"
+# 3	"Создание счета"
+# 4	"Ежедневное списание за пользование VPN"
+# 5	"Корректировка счета"
+# 6 "Пополнение через форму оплаты"
+
 
 
 def execute_query(req, fetch_one=True):
@@ -27,7 +40,7 @@ def execute_query(req, fetch_one=True):
     Returns:
         tuple or list: Результат выполнения запроса.
     """
-    with closing(psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)) as conn:
+    with closing(psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)) as conn:
         with conn.cursor() as cursor:
             cursor.execute(req)
             return cursor.fetchone() if fetch_one else cursor.fetchall()
@@ -211,7 +224,7 @@ def add_money_to_user_from_pay_form(telegram_id, summ):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(
-        f"insert into operations (summ, type, operation_date, user_id) values ({summ}, 2, '{date}', (select id from users where telegram_id = '{telegram_id}'))")
+        f"insert into operations (summ, type, operation_date, user_id) values ({summ}, 6, '{date}', (select id from users where telegram_id = '{telegram_id}'))")
 
 
 def get_list_keys():
