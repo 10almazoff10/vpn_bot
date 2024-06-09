@@ -65,7 +65,7 @@ def check_user(md5_hash):
     logger("Перебор авторизационных данных...")
     find_hash = False
     for hash in hash_list:
-        if hash == md5_hash:
+        if hash[0] == md5_hash:
             find_hash = True
         else:
             pass
