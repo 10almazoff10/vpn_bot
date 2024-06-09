@@ -118,7 +118,8 @@ def get_outline_server_list():
                         from
                             outline_servers;
                         """, fetch_one=False)
-        logger(list_servers)
+        for server in list_servers:
+            logger(server)
         return list_servers
     except Exception as error:
         logger(error)
