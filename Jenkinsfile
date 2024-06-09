@@ -21,7 +21,6 @@ pipeline {
       steps {
         echo "Send files to server"
         sh "ssh vpn-bot systemctl restart ${env.JOB_BASE_NAME}"
-        sh "ssh vpn-bot systemctl restart vpn-api-test"
 
 
       }
