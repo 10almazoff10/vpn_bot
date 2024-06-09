@@ -24,7 +24,6 @@ def get_api_key_for_great_server():
     logger("Получение списка серверов...")
     try:
         servers = dbcon.get_outline_server_list()
-        logger(servers)
     except Exception as error:
         logger("Ошибка получения списка серверов\n" + error)
         sys.exit(1)
