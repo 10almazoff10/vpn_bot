@@ -13,7 +13,7 @@ pipeline {
         sh "ssh vpn-bot rm -rf /root/${env.JOB_BASE_NAME}/api"
         sh "ssh vpn-bot mkdir /root/${env.JOB_BASE_NAME}/api"
         sh "scp ./VPN_by_Prokin/dist/vpn-bot-develop vpn-bot:/root/${env.JOB_BASE_NAME}/"
-        sh "scp ./vpn-bot-api/dist/vpn-bot-api vpn-bot:/root/${env.JOB_BASE_NAME}/api/"
+        sh "scp ./vpn_bot_api/dist/vpn-bot-api vpn-bot:/root/${env.JOB_BASE_NAME}/api/"
         
       }
     }
