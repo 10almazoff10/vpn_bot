@@ -6,15 +6,14 @@ from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
 from botApp.logs import logger
-from botApp import config
 from backend import background
-
+from botApp import config
 
 # Run Backend
 backend = Thread(target=background.run_backend)
 backend.start()
 
-### Loadming config
+### Loading config
 
 API_TOKEN = config.API_KEY
 bot = telebot.TeleBot(API_TOKEN)
@@ -41,14 +40,13 @@ ADMIN_ID = config.ADMIN_ID
 def send_welcome(message):
     logger.logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
     if dbcon.check_user_indb(message):
-        print("user find")
         bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.",
                          reply_markup=tg_keyboard.main_keyboard())
         dbcon.set_status(message, 20)
     else:
-        print("Зарегистрирован новый пользователь!")
         bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.",
                          reply_markup=tg_keyboard.main_keyboard())
+        logger.logger(message)
         dbcon.add_new_user(message)
         dbcon.set_status(message, 20)
 
@@ -110,7 +108,6 @@ def status(message):
     logger.logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
     user_status = dbcon.get_status(message)
 
-    print(sender_telegram_id, user_status, message.text)
 
     if user_status == MAIN_MENU:
 
@@ -176,23 +173,14 @@ def status(message):
             if dbcon.get_user_balance(sender_telegram_id) > MINIMAL_BALANCE:
 
                 dbcon.set_status(message, CHECK_KEYS)
-                bot.send_message(sender_telegram_id, "Проверяем Ваши ключи...")
-                keys = dbcon.get_user_vpn_keys(message)
-                print(keys)
-                if keys == []:
-                    dbcon.set_status(message, DONT_HAVE_KEYS)
-                    bot.send_message(sender_telegram_id,
-                                     "На данный момент ключей не зарегистрировано.\nЖелаете зарегистрировать?",
-                                     reply_markup=tg_keyboard.yes_or_no_keyboard())
-                elif keys != []:
-                    user_keys = str()
-                    for key in keys:
-                        user_keys = user_keys + f"Ключ для подключения:\n`{key[0]}`\n-----------\n"
-
-                    dbcon.set_status(message, MAIN_MENU)
-                    bot.send_message(sender_telegram_id, user_keys, parse_mode="MARKDOWN",
+                bot.send_message(sender_telegram_id, "Проверяем Ваш ключ...")
+                key = dbcon.get_user_vpn_key(sender_telegram_id)
+                user_key = f"Ключ для подключения:\n`{key}`"
+                dbcon.set_status(message, MAIN_MENU)
+                bot.send_message(sender_telegram_id, user_key, parse_mode="MARKDOWN",
                                      reply_markup=tg_keyboard.main_keyboard())
-                    bot.send_message(sender_telegram_id, "Инструкция по подключению - /help")
+                bot.send_message(sender_telegram_id, "Инструкция по подключению - /help")
+
             else:
                 bot.send_message(sender_telegram_id,
                                  f"Ваш баланс менее {MINIMAL_BALANCE} рублей, пожалуйста, пополните баланс для создания нового ключа",
@@ -252,18 +240,14 @@ def status(message):
 
     elif user_status == DONT_HAVE_KEYS:
         if message.text == "Да":
-            bot.send_message(sender_telegram_id, "Выполняется регистрация нового ключа...")
-            dbcon.create_new_key(message)
-            keys = dbcon.get_user_vpn_keys(message)
-            user_keys = str()
-            for key in keys:
-                user_keys = user_keys + f"-----------\nКлюч:\n`{key[0]}`"
-
-            dbcon.set_status(message, MAIN_MENU)
-            bot.send_message(sender_telegram_id, user_keys, parse_mode="MARKDOWN",
+            bot.send_message(sender_telegram_id, "Выполняется регистрация ключа...")
+            user_key = dbcon.get_user_vpn_key(sender_telegram_id)
+            bot.send_message(sender_telegram_id, user_key, parse_mode="MARKDOWN",
                              reply_markup=tg_keyboard.main_keyboard())
             bot.send_message(sender_telegram_id, "Информацию по активации ключа можно получить в команде /help",
                              reply_markup=tg_keyboard.main_keyboard())
+            dbcon.set_status(message, MAIN_MENU)
+
 
         elif message.text == "Нет":
             bot.send_message(sender_telegram_id, "Отмена...", reply_markup=tg_keyboard.main_keyboard())
@@ -311,10 +295,10 @@ def status(message):
                     traffic = "нет ключа"
                 if user[4] == 0:
                     active_count += 1
-                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб. {traffic}\n"
+                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
                 else:
                     disabled_count += 1
-                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб. {traffic}\n"
+                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
 
             message_with_users = f"""Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled_users}"""
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
@@ -366,7 +350,6 @@ def status(message):
         if message.text == "Да":
             dbcon.add_money_to_user_from_buffer(message)
             creds = dbcon.execute_query("select user_id, summ from operation_buffer")
-            print(creds)
             dbcon.insert_in_db("delete from operation_buffer")
             bot.send_message(sender_telegram_id, f"Баланс успешно пополнен",
                              reply_markup=tg_keyboard.admin_keyboard())
@@ -424,7 +407,6 @@ def status(message):
 
 @bot.shipping_query_handler(func=lambda query: True)
 def shipping(shipping_query):
-    print(shipping_query)
     bot.answer_shipping_query(shipping_query.id, ok=True, shipping_options=shipping_options,
                               error_message='Oh, seems like our Dog couriers are having a lunch right now. Try again later!')
 

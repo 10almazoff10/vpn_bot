@@ -1,12 +1,12 @@
 from datetime import datetime
-from botApp import config
+import config
 
 LOGS_DIR = config.LOGS_DIR
 # Логгер для отладки
 def logger(logs):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d")
-    logFile = f"{LOGS_DIR}/telebot-{date}.log"
+    logFile = f"{LOGS_DIR}/api/bot-api-{date}.log"
     try:
         with open(logFile, "a", encoding='utf-8') as file:
                 dt = datetime.now()
@@ -20,5 +20,5 @@ def logger(logs):
 def get_file_log():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d")
-    logFile = f"{LOGS_DIR}/telebot-{date}.txt"
+    logFile = f"{LOGS_DIR}/api/bot-api-{date}.log"
     return open(logFile, "rb")
