@@ -85,6 +85,8 @@ def check_user(md5_hash):
 
             logger("Ключ отправлен...")
             return jsonify({"server": server, "server_port": server_port, "password": password, "method": method})
+        elif user_state == False:
+            return Response("Ключ заблокирован, пожалуйста пополните баланс", 401)
     else:
         return Response("Вы не авторизованы!", 401)
 
