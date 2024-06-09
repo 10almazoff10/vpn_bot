@@ -1,6 +1,6 @@
 import yaml
 
-with open('../VPN_by_Prokin/config.yaml', 'r') as file:
+with open('../config.yaml', 'r') as file:
     cfg_file = yaml.safe_load(file)
 
 database = cfg_file["database"]
