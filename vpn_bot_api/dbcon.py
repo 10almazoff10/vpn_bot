@@ -65,7 +65,7 @@ def get_user_hashes():
     Returns:
 
     """
-    return execute_query("select user_key from users where user_key is not null;", fetch_one=False)[0]
+    return execute_query("select user_key from users where user_key != '';", fetch_one=False)
 
 def get_telegram_id_user_from_hash(hash):
     """
