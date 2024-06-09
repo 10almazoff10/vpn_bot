@@ -1,3 +1,27 @@
+1.4.0 09.06.2024
+- Система переписана для использования динамических ключей!
+- Создан Api для выдачи ключей от серверов.
+
+
+
+ALTER TABLE IF EXISTS public.users
+    ADD COLUMN user_key text;
+
+
+CREATE TABLE public.outline_servers
+(
+    id smallint,
+    name text NOT NULL,
+    comment text NOT NULL,
+    country text NOT NULL,
+    speed_in_kbytes integer NOT NULL,
+    connection_link text NOT NULL,
+    creation_date date NOT NULL,
+    standby_status boolean NULL,
+    active_keys int DEFAULT 0 NULL,
+    PRIMARY KEY (id)
+);
+
 1.3.1 2024.05.20
 - Добавлен новый статус операции 6 для пополнений через форму оплаты
 - Небольшие исправления читаемости кода

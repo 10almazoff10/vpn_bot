@@ -3,3 +3,5 @@ telebot
 psycopg2-binary
 schedule
 pyyaml
+FastAPI
+flask

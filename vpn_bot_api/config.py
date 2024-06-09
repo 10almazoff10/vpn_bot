@@ -1,14 +1,7 @@
 import yaml
 
-with open('./config.yaml', 'r') as file:
+with open('../VPN_by_Prokin/config.yaml', 'r') as file:
     cfg_file = yaml.safe_load(file)
-
-
-API_KEY = cfg_file["telegram"]["api"]
-ADMIN_ID = cfg_file["telegram"]["admin_id"]
-
-#OUTLINE_API_KEY = cfg_file["outline"]["api"]
-PROVIDER_TOKEN = cfg_file["providers"]["yookassa"]
 
 database = cfg_file["database"]
 

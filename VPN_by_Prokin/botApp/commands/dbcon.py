@@ -9,6 +9,7 @@ from botApp.commands import outline_api_reqests as outline
 import string
 from botApp import config
 from botApp.logs.logger import logger
+from botApp.crypt.MD5 import MD5
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
@@ -28,7 +29,7 @@ logger(f"{DB_HOST}, {DB_USER}, {DB_NAME}")
 # 6 "Пополнение через форму оплаты"
 
 
-
+#### Функции работы с БД ####
 def execute_query(req, fetch_one=True):
     """
     Выполняет SQL-запрос к базе данных.
@@ -64,8 +65,17 @@ def insert_in_db(req):
     except Exception as error:
         print(f'Error inserting data: {error}')
 
+### Работа с пользователями
 
 def add_new_user(message):
+    """
+    Функция для добавления нового пользователя. Принимает на вход message из telegram
+    Args:
+        message:
+
+    Returns:
+
+    """
     telegram_id = message.from_user.id
     name = message.from_user.first_name
     if len(name) < 15 and is_good_string(name):
@@ -76,8 +86,11 @@ def add_new_user(message):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     status = 10
+
+    user_key = gen_crypted_data(message.from_user.id)
+
     insert_in_db(
-        f"INSERT INTO users (telegram_id, name, date_first_enter, status) VALUES ({telegram_id}, '{name}','{date}', {status})")
+        f"INSERT INTO users (telegram_id, name, date_first_enter, status, user_key) VALUES ({telegram_id}, '{name}','{date}', {status}, '{user_key}')")
     insert_in_db(
         f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
 
@@ -91,6 +104,14 @@ def get_user_id(telegram_id):
     id_user
     """
     return execute_query(f"select id from users where telegram_id = '{telegram_id}';")[0]
+
+def get_telegram_id_users():
+    """
+    Возвращает TG id всех зарегистрированных пользователей
+    Returns:
+
+    """
+    return execute_query('select telegram_id from users;', False)
 def is_good_string(text):
     # Проверяем, что строка состоит только из русских и английских букв, символов и цифр
     allowed_characters = string.ascii_letters + string.digits + "-_., "
@@ -150,9 +171,27 @@ def get_operations_user(message, count=10):
                                     ORDER BY id DESC LIMIT {count}""", fetch_one=False)
 
 
-def get_user_vpn_keys(message):
-    return execute_query(f"""SELECT access_url from users_vpn_keys
-                               where user_name = '{message.from_user.id}'""", fetch_one=False)
+def get_user_vpn_key(telegram_id):
+    """
+    Возвращает динамический ключ пользователя
+    Args:
+        message:
+
+    Returns:
+
+    """
+
+    user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
+    print(user_token)
+    if user_token =="":
+        user_key = gen_crypted_data(telegram_id)
+        insert_in_db(
+            f"UPDATE users set user_key = '{user_key}' where telegram_id = '{telegram_id}'")
+        user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
+
+
+    user_key = f"ssconf://devblog.space:443/conf/{user_token}"
+    return user_key
 
 
 def get_user_traffic(message):
@@ -181,17 +220,37 @@ def get_users_from_outline():
 
         insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', {id});")
 
+def get_all_outline_servers():
+    links = execute_query("SELECT connection_link FROM outline_servers;", fetch_one=False)
+    print(links)
+    return links
+
+def gen_crypted_data(telegram_id:str) -> str:
+    SALT = "ProkinVPN"
+    crypt = MD5(SALT + str(telegram_id))
+    return crypt.encrypt()
+#print(crypt.decrypt("Hello, world!"))  # Decrypt data argument
 
 def create_new_key(message):
+    new_key = gen_crypted_data(message.from_user.id)
+
+
+
+    servers_api = get_all_outline_servers()
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    telegram_id = message.from_user.id
-    data = outline.create_new_key(telegram_id)
-    key = data[1]
-    key_id = data[0]
-    insert_in_db(f"""insert into users_vpn_keys (key_id, user_name, access_url, date_reg)
-                           values ('{key_id}',{telegram_id}, '{key}', '{date}') """)
+    telegram_id = str(message.from_user.id)
+    data = outline.create_new_keys(telegram_id, servers_api)
+    print(data)
+    for client_creds in data:
+        key_id = client_creds[0]
+        key = client_creds[1]
+        insert_in_db(f"""insert into users_vpn_keys (key_id, user_name, access_url, date_reg)
+                               values ('{key_id}',{telegram_id}, '{key}', '{date}') """)
 
+    crypted_key = gen_crypted_data(telegram_id)
+
+    print(crypted_key)
 
 ########### ADMIN ############
 
