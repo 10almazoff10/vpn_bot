@@ -254,23 +254,40 @@ def create_new_key(message):
 
 ########### ADMIN ############
 
-def get_list_users():
+def get_list_users_with_state():
     """
     Получение информации о пользователях
     Returns:
     Возвращает список пользователей и их трафик
     """
-    return execute_query("""SELECT name,
-                                       telegram_id,
-                                       balance,
-                                       id,
-                                       user_state,
-                                       keys.traffic
-                                FROM   users
-                                       left join users_vpn_keys AS keys
-                                         ON keys.user_name = users.telegram_id
-                                ORDER  BY id ASC;""",
-                         fetch_one=False)
+    active_users = execute_query("""select
+                                            name,
+                                            telegram_id,
+                                            balance,
+                                            id,
+                                            user_state
+                                        from
+                                            users
+                                        where
+                                            user_state = 0
+                                        order by
+                                            id asc;""",
+                                     fetch_one=False)
+
+    disabled_users = execute_query("""select
+                                            name,
+                                            telegram_id,
+                                            balance,
+                                            id,
+                                            user_state
+                                        from
+                                            users
+                                        where
+                                            user_state = 1
+                                        order by
+                                            id asc;""",
+                                 fetch_one=False)
+    return active_users, disabled_users
 
 
 def add_money_to_user_from_buffer(message):

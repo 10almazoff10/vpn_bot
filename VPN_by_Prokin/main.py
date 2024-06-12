@@ -97,6 +97,8 @@ CHECK_KEYS = 50
 DONT_HAVE_KEYS = 51
 ADMIN_MENU = 99
 
+BROADCAST = 94
+
 ### Balances
 
 MINIMAL_BALANCE = -5
@@ -284,23 +286,21 @@ def status(message):
 
     elif user_status == ADMIN_MENU:
         if message.text == "Список пользователей":
-            users_list = dbcon.get_list_users()
+            active_users, disabled_users = dbcon.get_list_users_with_state()
             active = str()
-            disabled_users = str()
+            disabled = str()
             active_count = 0
             disabled_count = 0
-            for user in users_list:
-                traffic = user[5]
-                if traffic == None:
-                    traffic = "нет ключа"
-                if user[4] == 0:
-                    active_count += 1
-                    active = active + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
-                else:
-                    disabled_count += 1
-                    disabled_users = disabled_users + f"{user[3]}, {user[0]}, {user[1]}, баланс: {user[2]} руб.\n"
+            for user in active_users:
+                active_count += 1
+                active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб.\n"
 
-            message_with_users = f"""Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled_users}"""
+            for user in disabled_users:
+                print(disabled_users)
+                disabled_count += 1
+                disabled = disabled + f"{user[3]}, {user[0]}, баланс: {user[2]} руб.\n"
+
+            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled}"
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
@@ -332,6 +332,10 @@ def status(message):
         elif message.text == "Написать сообщение пользователю":
             dbcon.set_status(message, 95)
             bot.send_message(sender_telegram_id, f"Введите ID клиента и cообщение")
+
+        elif message.text == "Рассылка":
+            dbcon.set_status(message, BROADCAST)
+            bot.send_message(sender_telegram_id, f"Введите текст сообщения")
 
 
         else:
@@ -396,6 +400,24 @@ def status(message):
             bot.send_message(sender_telegram_id, f"Не удалось получить telegram_id пользователя\n`{error}`",
                              reply_markup=tg_keyboard.admin_keyboard())
             dbcon.set_status(message, ADMIN_MENU)
+
+    elif user_status == BROADCAST:
+        text = message.text
+        list_telegram_id = dbcon.get_telegram_id_users()
+        counter_done = 0
+        counter_error = 0
+        for telegram_id in list_telegram_id:
+            try:
+                bot.send_message(telegram_id[0], text)
+                counter_done += 1
+            except Exception as error:
+                counter_error += 1
+                logger.logger(f"Ошибка отправки сообщения пользователю\n{error}")
+
+        bot.send_message(sender_telegram_id, f"Успешно отправлено: {counter_done}\nОшибка отправки: {counter_error}",
+                                    reply_markup=tg_keyboard.admin_keyboard())
+        dbcon.set_status(message, ADMIN_MENU)
+
 
     else:
         bot.send_message(sender_telegram_id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...",
