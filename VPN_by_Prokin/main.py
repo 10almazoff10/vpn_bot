@@ -298,7 +298,7 @@ def status(message):
                     key = user[5]
                 except:
                     key = ""
-                if key == "":
+                if key == "" or key == None:
                     key = "ключа нет"
                 else:
                     key = f"{key[:7]}.."
