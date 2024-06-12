@@ -291,14 +291,30 @@ def status(message):
             disabled = str()
             active_count = 0
             disabled_count = 0
+
             for user in active_users:
                 active_count += 1
-                active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб.\n"
+                try:
+                    key = user[5]
+                except:
+                    key = ""
+                if key == "":
+                    key = "ключа нет"
+                else:
+                    key = f"{key[:7]}.."
+                active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
 
             for user in disabled_users:
-                print(disabled_users)
+                try:
+                    key = user[5]
+                except:
+                    key = ""
+                if key == "":
+                    key = "ключа нет"
+                else:
+                    key = f"{key[:5]}.."
                 disabled_count += 1
-                disabled = disabled + f"{user[3]}, {user[0]}, баланс: {user[2]} руб.\n"
+                disabled = disabled + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
 
             message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled}"
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")

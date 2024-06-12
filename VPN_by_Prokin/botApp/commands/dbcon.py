@@ -265,7 +265,8 @@ def get_list_users_with_state():
                                             telegram_id,
                                             balance,
                                             id,
-                                            user_state
+                                            user_state,
+                                            user_key
                                         from
                                             users
                                         where

@@ -41,29 +41,24 @@ def one_day_using():
 
 
 def send_give_price():
-    users_balance = dbcon.execute_query("""select U.telegram_id, U.balance, V.key_id 
-                                                    FROM users AS U 
-                                                    JOIN users_vpn_keys AS V 
-                                                    ON V.user_name = U.telegram_id;""", False)
+    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state FROM users where balance < 5;""", False)
     for user in users_balance:
-        if float(user[1]) < 10 and float(user[1]) > -5:
+        if float(user[1]) > -5:
             bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
             try:
-                bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 10 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
+                bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 5 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
                 bot.send_message(ADMIN_ID, f"Успешно отправлено")
-            except :
+            except Exception as error:
                 bot.send_message(ADMIN_ID, f"Не удалось отправить...")
+                logger(f"Не удалось отправить...\n{error}")
 
-        elif float(user[1]) <= -5:
-            id = user[2]
+        elif float(user[1]) <= float(-5):
             telegram_id = user[0]
-            outline_api_reqests.remove_key(id)
-            dbcon.insert_in_db(f"delete from users_vpn_keys where key_id = '{id}';")
             dbcon.insert_in_db(f"update users set user_state = 1 where telegram_id = '{telegram_id}';")
-            bot.send_message(ADMIN_ID, f"Удаляю пользователя {user[0]}")
+            bot.send_message(ADMIN_ID, f"Блокирую пользователя {user[0]}")
             try:
-                bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет и сгенерируйте новый ключ.")
-                bot.send_message(ADMIN_ID, f"Пользователь удален {user[0]}")
+                bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет.")
+                bot.send_message(ADMIN_ID, f"Пользователь заблокирован {user[0]}")
             except Exception as error:
                 bot.send_message(ADMIN_ID, f"Ошибка удаления пользователя {user[0]}\n{error}")
             
