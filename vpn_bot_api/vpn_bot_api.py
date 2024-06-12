@@ -101,7 +101,7 @@ def check_number():
     return jsonify({"server": server, "server_port": server_port, "password": password, "method": method})
 
 def run_api():
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=False)
 
 if __name__ == "__main__":
     run_api()
