@@ -116,7 +116,8 @@ def get_outline_server_list():
                             creation_date,
                             standby_status
                         from
-                            outline_servers;
+                            outline_servers
+                        where standby_status = True;
                         """, fetch_one=False)
         for server in list_servers:
             logger(server)
