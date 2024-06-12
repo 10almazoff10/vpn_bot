@@ -19,6 +19,7 @@ def admin_keyboard():
     button3 = telebot.types.KeyboardButton(text="Написать сообщение пользователю")
     button4 = telebot.types.KeyboardButton(text="Выручка")
     button6 = telebot.types.KeyboardButton(text="Логи")
+    button7 = telebot.types.KeyboardButton(text="Рассылка")
     button_exit = telebot.types.KeyboardButton(text="Выход из админки")
     keyboard.add(button1, button2)
     keyboard.add(button4, button6)
