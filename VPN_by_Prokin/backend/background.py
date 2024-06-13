@@ -41,7 +41,7 @@ def one_day_using():
 
 
 def send_give_price():
-    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state FROM users where balance < 5;""", False)
+    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state FROM users where balance < 5 and user_state != 1;""", False)
     for user in users_balance:
         if float(user[1]) > -5:
             bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
@@ -60,11 +60,15 @@ def send_give_price():
                 bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет.")
                 bot.send_message(ADMIN_ID, f"Пользователь заблокирован {user[0]}")
             except Exception as error:
-                bot.send_message(ADMIN_ID, f"Ошибка удаления пользователя {user[0]}\n{error}")
+                bot.send_message(ADMIN_ID, f"Ошибка отправки сообщения пользователю {user[0]}\n{error}")
             
-def update_balance():    
-    dbcon.calc_balances()
+def update_balance():
     logger("Просчитываем баланс пользователей...")
+    try:
+        dbcon.calc_balances()
+    except Exception as error:
+        logger(f"Ошибка просчета баланса: \n{error}")
+    
 
 
 
