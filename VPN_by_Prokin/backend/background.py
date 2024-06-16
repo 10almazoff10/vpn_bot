@@ -10,7 +10,7 @@ import time
 from botApp.logs.logger import logger
 
 
-VERSION = "1.4.0 - 2024.06.09"
+VERSION = "1.4.1 - 2024.06.16"
 
 PRICE_PER_MOUNTH = 75
 
@@ -37,7 +37,6 @@ def one_day_using():
             	       '{date}',
                 	id FROM users where balance > '-5';
                 	""")
-
 
 
 def send_give_price():
@@ -68,9 +67,6 @@ def update_balance():
         dbcon.calc_balances()
     except Exception as error:
         logger(f"Ошибка просчета баланса: \n{error}")
-    
-
-
 
 def convert_size(size_bytes):
    if size_bytes == 0:
@@ -81,33 +77,13 @@ def convert_size(size_bytes):
    s = round(size_bytes / p, 2)
    return "%s %s" % (s, size_name[i])
 
-def get_key_traffic():
-    try: 
-        data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
-    except Exception as error:
-        logger(error)
-
-    key_id = dbcon.get_list_keys()
-    logger("Выполняется загрузка информации о трафике..")
-
-    for i in key_id:
-        try:
-            traffic = convert_size(int(data[f"{i[0]}"]))
-
-            dbcon.insert_in_db(f"update users_vpn_keys set traffic = '{traffic}' where key_id = {i[0]};")
-        except:
-            pass
-    logger("Загрузка выполнена.")
-
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
-schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
 
 def run_backend():
     dt = datetime.now()
-    date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    get_key_traffic()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")\
     logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}")
 
