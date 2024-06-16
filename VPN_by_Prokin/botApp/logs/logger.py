@@ -20,5 +20,5 @@ def logger(logs):
 def get_file_log():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d")
-    logFile = f"{LOGS_DIR}/telebot-{date}.txt"
+    logFile = f"{LOGS_DIR}/telebot-{date}.log"
     return open(logFile, "rb")
