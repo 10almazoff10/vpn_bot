@@ -83,7 +83,7 @@ schedule.every().day.at("10:30").do(send_give_price)
 
 def run_backend():
     dt = datetime.now()
-    date = dt.strftime("%Y-%m-%d %H:%M:%S")\
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
     logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}")
 
