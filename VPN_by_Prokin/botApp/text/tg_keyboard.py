@@ -22,7 +22,7 @@ def admin_keyboard():
     button7 = telebot.types.KeyboardButton(text="Рассылка")
     button_exit = telebot.types.KeyboardButton(text="Выход из админки")
     keyboard.add(button1, button2)
-    keyboard.add(button4, button6)
+    keyboard.add(button4, button6, button7)
     keyboard.add(button3, button_exit)
     return keyboard
 

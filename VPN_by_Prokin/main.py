@@ -40,13 +40,17 @@ ADMIN_ID = config.ADMIN_ID
 def send_welcome(message):
     logger.logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
     if dbcon.check_user_indb(message):
-        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.",
+        bot.send_message(message.from_user.id,
+                         messages.hello_message,
                          reply_markup=tg_keyboard.main_keyboard())
         dbcon.set_status(message, 20)
     else:
-        bot.send_message(message.from_user.id, "Это бот для учета баланса VPN сервиса VPN_by_Prokin.",
+        bot.send_message(message.from_user.id,
+                         messages.hello_message,
                          reply_markup=tg_keyboard.main_keyboard())
         logger.logger(message)
+        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь
+                                            {message.from_user.id}, {message.from_user.first_name}""")
         dbcon.add_new_user(message)
         dbcon.set_status(message, 20)
 

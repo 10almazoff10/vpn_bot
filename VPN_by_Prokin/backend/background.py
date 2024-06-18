@@ -41,10 +41,10 @@ def one_day_using():
 
 
 def send_give_price():
-    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state FROM users where balance < 5;""", False)
+    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state, id FROM users where balance < 5;""", False)
     for user in users_balance:
         if float(user[1]) > -5:
-            bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[0]} о низком балансе")
+            bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[3]} о низком балансе")
             try:
                 bot.send_message(user[0], f"""Уважаемый пользователь, Ваш баланс менее 5 рублей, пожалуйста пополните счет\nНапоминаю что при балансе менее -5 рублей, доступ будет заблокирован""")
                 bot.send_message(ADMIN_ID, f"Успешно отправлено")
