@@ -65,6 +65,7 @@ def insert_in_db(req):
     except Exception as error:
         print(f'Error inserting data: {error}')
 
+
 ### Работа с пользователями
 
 def add_new_user(message):
@@ -178,11 +179,11 @@ def get_user_vpn_key(telegram_id):
         message:
 
     Returns:
+        user_key: String
 
     """
 
     user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
-    print(user_token)
     if user_token =="":
         user_key = gen_crypted_data(telegram_id)
         insert_in_db(
@@ -192,11 +193,6 @@ def get_user_vpn_key(telegram_id):
 
     user_key = f"ssconf://devblog.space:443/conf/{user_token}"
     return user_key
-
-
-def get_user_traffic(message):
-    return \
-    execute_query(f"select traffic from users_vpn_keys where user_name = '{message.from_user.id}'", fetch_one=False)[0]
 
 
 def get_users_from_outline():
@@ -229,28 +225,7 @@ def gen_crypted_data(telegram_id:str) -> str:
     SALT = "ProkinVPN"
     crypt = MD5(SALT + str(telegram_id))
     return crypt.encrypt()
-#print(crypt.decrypt("Hello, world!"))  # Decrypt data argument
 
-def create_new_key(message):
-    new_key = gen_crypted_data(message.from_user.id)
-
-
-
-    servers_api = get_all_outline_servers()
-    dt = datetime.now()
-    date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    telegram_id = str(message.from_user.id)
-    data = outline.create_new_keys(telegram_id, servers_api)
-    print(data)
-    for client_creds in data:
-        key_id = client_creds[0]
-        key = client_creds[1]
-        insert_in_db(f"""insert into users_vpn_keys (key_id, user_name, access_url, date_reg)
-                               values ('{key_id}',{telegram_id}, '{key}', '{date}') """)
-
-    crypted_key = gen_crypted_data(telegram_id)
-
-    print(crypted_key)
 
 ########### ADMIN ############
 
@@ -302,10 +277,6 @@ def add_money_to_user_from_pay_form(telegram_id, summ):
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(
         f"insert into operations (summ, type, operation_date, user_id) values ({summ}, 6, '{date}', (select id from users where telegram_id = '{telegram_id}'))")
-
-
-def get_list_keys():
-    return execute_query(f"select key_id, user_name from users_vpn_keys order by key_id asc;", fetch_one=False)
 
 
 def get_user_telegram_id(id):

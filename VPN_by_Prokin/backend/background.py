@@ -7,7 +7,8 @@ import telebot
 import math
 import schedule
 import time
-from botApp.logs.logger import logger
+from botApp.logs.logger import logger, log_rotate
+import sys
 
 
 VERSION = "1.4.2 - 2024.06.18"
@@ -31,17 +32,15 @@ def one_day_using():
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
 
     dbcon.insert_in_db(f"""insert into operations (summ, type, operation_date, user_id)
-	               select
-    	               {one_day_price},
-    		       4,
-            	       '{date}',
-                	id FROM users where balance > '-5';
-                	""")
-
-
+	                       select
+    	                   {one_day_price},
+    		               4,
+            	           '{date}',
+                	       id FROM users where balance > '-5';
+                	    """)
 
 def send_give_price():
-    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state, id FROM users where balance < 5;""", False)
+    users_balance = dbcon.execute_query("""select telegram_id, balance, user_state, id FROM users where balance <= 5 and user_state != 1;""", False)
     for user in users_balance:
         if float(user[1]) > -5:
             bot.send_message(ADMIN_ID, f"Пробуем отправить письмо пользователю {user[3]} о низком балансе")
@@ -66,8 +65,6 @@ def update_balance():
     dbcon.calc_balances()
     logger("Просчитываем баланс пользователей...")
 
-
-
 def convert_size(size_bytes):
    if size_bytes == 0:
        return "0B"
@@ -77,34 +74,25 @@ def convert_size(size_bytes):
    s = round(size_bytes / p, 2)
    return "%s %s" % (s, size_name[i])
 
-def get_key_traffic():
-    try: 
-        data = outline_api_reqests.get_stat()["bytesTransferredByUserId"]
-    except Exception as error:
-        logger(error)
-
-    key_id = dbcon.get_list_keys()
-    logger("Выполняется загрузка информации о трафике..")
-
-    for i in key_id:
-        try:
-            traffic = convert_size(int(data[f"{i[0]}"]))
-
-            dbcon.insert_in_db(f"update users_vpn_keys set traffic = '{traffic}' where key_id = {i[0]};")
-        except:
-            pass
-    logger("Загрузка выполнена.")
-
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
-schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
+schedule.every().day.at("03:10").do(log_rotate)
+
 
 def run_backend():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    get_key_traffic()
     logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
+    try:
+        dbcon.execute_query("select 1", fetch_one=True)
+    except Exception as error:
+        logger("Ошибка подключения к БД, выход...")
+        logger(error)
+        bot.send_message(ADMIN_ID, f"Ошибка подключения к БД, {error}")
+
+        sys.exit(1)
+
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}")
 
     while True:
