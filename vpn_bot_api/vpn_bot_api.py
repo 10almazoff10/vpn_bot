@@ -33,9 +33,14 @@ def get_api_key_for_great_server():
     for server in servers:
         server_id = server[0]
         server_api_key = server[5]
-        outline_responce = outline_api_requests.get_count_active_keys(server[5])
-        count_keys = len(outline_responce['accessKeys'])
-        data.append([count_keys, server_id, server_api_key])
+        try:
+            outline_responce = outline_api_requests.get_count_active_keys(server[5])
+            count_keys = len(outline_responce['accessKeys'])
+            data.append([count_keys, server_id, server_api_key])
+        except Exception as error:
+            logger(f"Ошибка подключения к серверу {server[0]}\n{error}")
+
+
     data.sort()
     great_server_id=data[0][1]
     logger(f"ID оптимального сервера: {great_server_id}")
@@ -71,6 +76,8 @@ def check_user(md5_hash):
 
     if find_hash:
         telegram_id = dbcon.get_telegram_id_user_from_hash(md5_hash)
+        logger(f"Подключается пользователь {telegram_id}")
+        dbcon.write_stat(telegram_id, "connect")
         user_state = check_user_state(telegram_id)
         if user_state:
             logger("Пользователь не заблокирован, создание ключа...")
@@ -85,7 +92,7 @@ def check_user(md5_hash):
             logger("Ключ отправлен...")
             return jsonify({"server": server, "server_port": server_port, "password": password, "method": method})
         elif user_state == False:
-            return Response("Ключ заблокирован, пожалуйста пополните баланс", 401)
+            return jsonify({"message": "Ключ заблокирован, пожалуйста пополните баланс"})
     else:
         return Response("Вы не авторизованы!", 401)
 

@@ -4,6 +4,7 @@ import psycopg2
 from contextlib import closing
 import config
 from logs.logger import logger
+from datetime import datetime
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
@@ -137,3 +138,8 @@ def register_user_key(data):  # id, accessUrl, user_password, port, method, tele
     telegram_id = data[5]
 
     insert_in_db("INSERT INTO users_vpn_keys (key_id, telegram_id, accessUrl, user_password, port, method, )")
+
+def write_stat(telegram_id, stat_name="default"):
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
+    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date) values ('{telegram_id}', '{stat_name}', '{date}')")

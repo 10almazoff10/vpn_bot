@@ -11,7 +11,7 @@ from botApp.logs.logger import logger, log_rotate
 import sys
 
 
-VERSION = "1.4.2 - 2024.06.18"
+VERSION = "1.4.4 - 2024.06.27"
 
 PRICE_PER_MOUNTH = 75
 
@@ -74,10 +74,17 @@ def convert_size(size_bytes):
    s = round(size_bytes / p, 2)
    return "%s %s" % (s, size_name[i])
 
+def send_day_stat():
+    connection_count = dbcon.get_count_connection_last_day()
+    bot.send_message(ADMIN_ID, f"За последние сутки обработано {connection_count} коннектов")
+
+
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("03:10").do(log_rotate)
+schedule.every().day.at("10:30").do(send_day_stat)
+
 
 
 def run_backend():
