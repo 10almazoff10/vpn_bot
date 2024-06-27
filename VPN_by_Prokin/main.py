@@ -289,7 +289,7 @@ def status(message):
 
 
     elif user_status == ADMIN_MENU:
-        if message.text == "Список пользователей":
+        if message.text == "Пользователи":
             active_users, disabled_users = dbcon.get_list_users_with_state()
             active = str()
             disabled = str()
@@ -327,7 +327,7 @@ def status(message):
             dbcon.set_status(message, 20)
             bot.send_message(sender_telegram_id, f"Выход...", reply_markup=tg_keyboard.main_keyboard())
 
-        elif message.text == "Пополнить баланс пользователя":
+        elif message.text == "Пополнить баланс":
             dbcon.set_status(message, 97)
             bot.send_message(sender_telegram_id, f"Введите ID клиента и сумму в виде: 24 500")
 
@@ -349,13 +349,17 @@ def status(message):
             bot.send_message(sender_telegram_id,
                              f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
-        elif message.text == "Написать сообщение пользователю":
+        elif message.text == "Написать сообщение":
             dbcon.set_status(message, 95)
             bot.send_message(sender_telegram_id, f"Введите ID клиента и cообщение")
 
         elif message.text == "Рассылка":
             dbcon.set_status(message, BROADCAST)
             bot.send_message(sender_telegram_id, f"Введите текст сообщения")
+
+        elif message.text == "Статистика":
+            connection_count = dbcon.get_count_connection_last_day()
+            bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
 
 
         else:
