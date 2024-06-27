@@ -342,9 +342,9 @@ def status(message):
             bot.send_document(sender_telegram_id, file)
 
         elif message.text == "Выручка":
-            money_all = dbcon.execute_query("select sum(summ) from operations where type = 2 or type = 6")[0]
+            money_all = dbcon.execute_query("select sum(summ) from operations where  type in (2,6)")[0]
             money_last_mounth = dbcon.execute_query(
-                "select sum(summ) from operations where (type = 2 or type = 6) and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
+                "select sum(summ) from operations where type in (2,6) and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
             bot.send_message(sender_telegram_id,
                              f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
