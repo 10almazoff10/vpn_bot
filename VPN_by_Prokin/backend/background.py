@@ -11,7 +11,7 @@ from botApp.logs.logger import logger, log_rotate
 import sys
 
 
-VERSION = "1.4.2 - 2024.06.18"
+VERSION = "1.4.4 - 2024.06.27"
 
 PRICE_PER_MOUNTH = 75
 
