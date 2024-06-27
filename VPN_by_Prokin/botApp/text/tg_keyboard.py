@@ -14,16 +14,17 @@ def main_keyboard():
 
 def admin_keyboard():
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = telebot.types.KeyboardButton(text="Список пользователей")
-    button2 = telebot.types.KeyboardButton(text="Пополнить баланс пользователя")
-    button3 = telebot.types.KeyboardButton(text="Написать сообщение пользователю")
+    button1 = telebot.types.KeyboardButton(text="Пользователи")
+    button2 = telebot.types.KeyboardButton(text="Пополнить баланс")
+    button3 = telebot.types.KeyboardButton(text="Написать сообщение")
     button4 = telebot.types.KeyboardButton(text="Выручка")
     button6 = telebot.types.KeyboardButton(text="Логи")
     button7 = telebot.types.KeyboardButton(text="Рассылка")
+    button8 = telebot.types.KeyboardButton(text="Статистика")
     button_exit = telebot.types.KeyboardButton(text="Выход из админки")
     keyboard.add(button1, button2)
     keyboard.add(button4, button6, button7)
-    keyboard.add(button3, button_exit)
+    keyboard.add(button3, button8, button_exit)
     return keyboard
 
 def admin_keyboard_keys():
