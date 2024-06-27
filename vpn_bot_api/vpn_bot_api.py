@@ -77,6 +77,7 @@ def check_user(md5_hash):
     if find_hash:
         telegram_id = dbcon.get_telegram_id_user_from_hash(md5_hash)
         logger(f"Подключается пользователь {telegram_id}")
+        dbcon.write_stat(telegram_id, "connect")
         user_state = check_user_state(telegram_id)
         if user_state:
             logger("Пользователь не заблокирован, создание ключа...")
