@@ -142,4 +142,4 @@ def register_user_key(data):  # id, accessUrl, user_password, port, method, tele
 def write_stat(telegram_id, stat_name="default"):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date) values '{telegram_id}', '{stat_name}', '{date}'")
+    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date) values ('{telegram_id}', '{stat_name}', '{date}')")
