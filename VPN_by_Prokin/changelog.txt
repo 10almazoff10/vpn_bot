@@ -1,3 +1,20 @@
+1.4.5 17.07.2024
+- Исправлен тип данных в таблице событий с date на timestamp
+- Создана таблица в БД содержащая версию бота
+
+ALTER TABLE users_stat
+ALTER COLUMN date TYPE TIMESTAMP;
+
+CREATE TABLE public.bot_version (
+	id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+	"version" text NOT NULL,
+	"date" timestamp NULL,
+	CONSTRAINT bot_version_pk PRIMARY KEY (id),
+	CONSTRAINT bot_version_unique UNIQUE ("version")
+);
+
+insert into bot_version (version, date) values ('1.4.5', (select now()));
+
 1.4.4 27.06.2024
 - Расширено логирование Api
 - Исправлена ошибка, при котороый пользователь не мог получить ключ из-за того что какой либо из серверов не отвечает

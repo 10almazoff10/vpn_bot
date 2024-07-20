@@ -10,8 +10,9 @@ import time
 from botApp.logs.logger import logger, log_rotate
 import sys
 
-
-VERSION = "1.4.4 - 2024.06.27"
+about_version = dbcon.get_version()
+VERSION = about_version[0]
+BUILD_DATE = about_version[1]
 
 PRICE_PER_MOUNTH = 75
 
@@ -100,7 +101,7 @@ def run_backend():
 
         sys.exit(1)
 
-    bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}")
+    bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
 
     while True:
         schedule.run_pending()
