@@ -358,7 +358,13 @@ def status(message):
 
         elif message.text == "Статистика":
             connection_count = dbcon.get_count_connection_last_day()
+            user_stats = dbcon.get_users_stats()
+            message = "```txt\n"
+            for user in user_stats:
+                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + "\n"
+            message += "\n```"
             bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
+            bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")
 
 
         else:

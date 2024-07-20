@@ -314,5 +314,25 @@ def unblock_user(telegram_id):
 def get_count_connection_last_day():
     return execute_query("SELECT count(*) from users_stat where date >= (now() - interval '1 day') and stat_name ='connect'")[0]
 
-def  get_version():
+def get_version():
     return execute_query("SELECT version, date FROM bot_version order by id desc limit 1;")
+
+def get_users_stats():
+    return execute_query("""select
+                                    u.id,
+                                    u.name,
+                                    count(us.telegram_id) as user_count
+                                from
+                                    users_stat us
+                                left join users u 
+                                    on
+                                    u.telegram_id = us.telegram_id
+                                where
+                                    us.date >= (current_date - interval '1 day')
+                                group by
+                                    u.id,
+                                    u.name
+                                order by
+                                    user_count desc;
+                                """,
+                                 fetch_one=False)
