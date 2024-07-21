@@ -82,10 +82,16 @@ def send_day_stat():
 
 def delete_all_keys_on_all_servers():
     list_servers = dbcon.get_outline_server_list()
-    for server in list_servers:
-        print(server[5])
-        server_api_key = server[5]
-        outline_api_reqests.remove_all_keys_on_server(server_api_key)
+    logger("Запущен процесс удаления старых ключей")
+    try:
+        for server in list_servers:
+            logger(f"Сервер - {server[0]}")
+            server_api_key = server[5]
+            count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
+            logger(f"Удалено {count} ключей")
+        logger("Очистка успешно выполнена!")
+    except Exception as error:
+        logger(f"Ошибка удаления:\n{error}")
 
 
 schedule.every().day.at("10:40").do(one_day_using)

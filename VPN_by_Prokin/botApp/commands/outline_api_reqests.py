@@ -1,6 +1,7 @@
 from botApp import config
 import requests
 import json
+from botApp.logs.logger import logger
 from datetime import datetime
 
 
@@ -26,10 +27,15 @@ def remove_key(id):
 def remove_all_keys_on_server(API_KEY):
     print(API_KEY)
     response = json.loads(requests.get(f"{API_KEY}/access-keys/", verify=False).text)
+    count=0
     for i in response["accessKeys"]:
+        count += 1
         id = i["id"]
-        remove_key(id)
-
+        try:
+            remove_key(id)
+        except Exception as error:
+            logger(f"Ошибка удаления ключа {id}\n{error}")
+    return count
 def get_stat():
     return json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)
 
