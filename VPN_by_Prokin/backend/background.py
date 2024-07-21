@@ -7,7 +7,7 @@ import telebot
 import math
 import schedule
 import time
-from botApp.logs.logger import logger, log_rotate
+from botApp.logs.logger import logger
 import sys
 
 about_version = dbcon.get_version()
