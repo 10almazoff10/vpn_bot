@@ -250,19 +250,12 @@ def get_list_users_with_state():
                                             id asc;""",
                                      fetch_one=False)
 
-    disabled_users = execute_query("""select
-                                            name,
-                                            telegram_id,
-                                            balance,
-                                            id,
-                                            user_state
+    disabled_users = execute_query("""select count(*)
                                         from
                                             users
                                         where
-                                            user_state = 1
-                                        order by
-                                            id asc;""",
-                                 fetch_one=False)
+                                            user_state = 1""",
+                                    fetch_one=False)[0]
     return active_users, disabled_users
 
 
