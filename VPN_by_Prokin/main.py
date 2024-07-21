@@ -479,6 +479,15 @@ def got_payment(message):
                          'Платеж успешно зачислен на ваш счет в размере `{} {}`'.format(
                              message.successful_payment.total_amount / 100, message.successful_payment.currency),
                          parse_mode='Markdown')
+
+        payer = dbcon.get_user_id(telegram_id)
+        bot.send_message(ADMIN_ID,
+                         'Успешная оплата пользователя `{}` в размере `{} {}`'.format(
+                             payer,
+                             message.successful_payment.total_amount / 100,
+                             message.successful_payment.currency),
+                             parse_mode='Markdown')
+
     except Exception as error:
         logger.logger(f"Ошибка при оплате\n{error}")
         bot.send_message(ADMIN_ID, f'Не удалось зачислить платеж пользователя {telegram_id} на сумму {summ}')
