@@ -139,7 +139,7 @@ def register_user_key(data):  # id, accessUrl, user_password, port, method, tele
 
     insert_in_db("INSERT INTO users_vpn_keys (key_id, telegram_id, accessUrl, user_password, port, method, )")
 
-def write_stat(telegram_id, stat_name="default"):
+def write_stat(telegram_id, ip, stat_name="default"):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date) values ('{telegram_id}', '{stat_name}', '{date}')")
+    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date, ip) values ('{telegram_id}', '{stat_name}', '{date}', '{ip}')")

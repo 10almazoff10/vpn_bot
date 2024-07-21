@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 import base64
 import dbcon
 import outline_api_requests
@@ -58,7 +58,7 @@ def get_key_for_user(telegram_id):
         return key_url
     except Exception as error:
         logger(f"Ошибка получения ключа:\n{error}")
-def check_user(md5_hash):
+def check_user(md5_hash, ip):
     logger("Проверка авторизации...")
     try:
         hash_list = dbcon.get_user_hashes()
@@ -77,7 +77,8 @@ def check_user(md5_hash):
     if find_hash:
         telegram_id = dbcon.get_telegram_id_user_from_hash(md5_hash)
         logger(f"Подключается пользователь {telegram_id}")
-        dbcon.write_stat(telegram_id, "connect")
+        dbcon.write_stat(telegram_id, ip, "connect")
+
         user_state = check_user_state(telegram_id)
         if user_state:
             logger("Пользователь не заблокирован, создание ключа...")
@@ -98,8 +99,10 @@ def check_user(md5_hash):
 
 @app.route('/conf/<md5_hash>')
 def handle_conf(md5_hash):
+    ip = request.remote_addr
+    logger(f"Запрос от - {ip}")
     logger(f"Request: {md5_hash}")
-    return check_user(md5_hash)
+    return check_user(md5_hash, ip)
 
 
 

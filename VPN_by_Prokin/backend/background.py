@@ -83,7 +83,6 @@ def send_day_stat():
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
-schedule.every().day.at("03:10").do(log_rotate)
 schedule.every().day.at("10:30").do(send_day_stat)
 
 
