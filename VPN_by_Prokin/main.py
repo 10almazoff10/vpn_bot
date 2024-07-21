@@ -293,9 +293,7 @@ def status(message):
         if message.text == "Пользователи":
             active_users, disabled_users = dbcon.get_list_users_with_state()
             active = str()
-            disabled = str()
             active_count = 0
-            disabled_count = 0
 
             for user in active_users:
                 active_count += 1
@@ -309,19 +307,7 @@ def status(message):
                     key = f"{key[:7]}.."
                 active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
 
-            for user in disabled_users:
-                try:
-                    key = user[5]
-                except:
-                    key = ""
-                if key == "":
-                    key = "ключа нет"
-                else:
-                    key = f"{key[:5]}.."
-                disabled_count += 1
-                disabled = disabled + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
-
-            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_count}\n{disabled}"
+            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_users}..."
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":

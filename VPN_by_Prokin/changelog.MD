@@ -1,8 +1,11 @@
 1.4.7 21.07.2024
 - Расширено логирование, добавлен ip адрес подключаемого пользователя
+- Изменено отображение заблокированных пользователей, теперь отображается только их количество
 
+```
 ALTER TABLE IF EXISTS public.users_stat
     ADD COLUMN ip text;
+```
 
 1.4.6 20.07.2024
 - Расширена статистика - добавлена статистика подключений по пользователям
@@ -11,6 +14,7 @@ ALTER TABLE IF EXISTS public.users_stat
 - Исправлен тип данных в таблице событий с date на timestamp
 - Создана таблица в БД содержащая версию бота
 
+```
 ALTER TABLE users_stat
 ALTER COLUMN date TYPE TIMESTAMP;
 
@@ -23,11 +27,13 @@ CREATE TABLE public.bot_version (
 );
 
 insert into bot_version (version, date) values ('1.4.5', (select now()));
+```
 
 1.4.4 27.06.2024
 - Расширено логирование Api
 - Исправлена ошибка, при котороый пользователь не мог получить ключ из-за того что какой либо из серверов не отвечает
 
+```
 CREATE TABLE public.users_stat (
 	id int GENERATED ALWAYS AS IDENTITY NOT NULL,
 	telegram_id text NOT NULL,
@@ -35,7 +41,7 @@ CREATE TABLE public.users_stat (
 	"date" date NULL,
 	CONSTRAINT users_stat_pk PRIMARY KEY (id)
 );
-
+```
 
 1.4.3 19.06.2024
 - Добавлен функционал сжатия логов
