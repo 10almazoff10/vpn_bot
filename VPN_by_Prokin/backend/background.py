@@ -80,12 +80,25 @@ def send_day_stat():
     bot.send_message(ADMIN_ID, f"За последние сутки обработано {connection_count} коннектов")
 
 
+def delete_all_keys_on_all_servers():
+    list_servers = dbcon.get_outline_server_list()
+    logger("Запущен процесс удаления старых ключей")
+    try:
+        for server in list_servers:
+            logger(f"Сервер - {server[0]}")
+            server_api_key = server[5]
+            count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
+            logger(f"Удалено {count} ключей")
+        logger("Очистка успешно выполнена!")
+    except Exception as error:
+        logger(f"Ошибка удаления:\n{error}")
+
+
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("10:30").do(send_day_stat)
-
-
+schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
 
 def run_backend():
     dt = datetime.now()
@@ -105,3 +118,4 @@ def run_backend():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
