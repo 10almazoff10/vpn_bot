@@ -111,6 +111,7 @@ MINIMAL_BALANCE = -5
 @bot.message_handler(func=lambda message: True)
 def status(message):
     sender_telegram_id = message.from_user.id
+    logger.logger(message)
     logger.logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
     user_status = dbcon.get_status(message)
 
