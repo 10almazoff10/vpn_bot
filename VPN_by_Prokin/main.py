@@ -307,7 +307,7 @@ def status(message):
                     key = f"{key[:7]}.."
                 active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
 
-            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_users}..."
+            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_users}"
             bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":

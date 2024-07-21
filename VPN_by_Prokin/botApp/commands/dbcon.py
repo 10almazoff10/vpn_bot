@@ -329,3 +329,32 @@ def get_users_stats():
                                     user_count desc;
                                 """,
                                  fetch_one=False)
+
+def get_outline_server_list():
+    """
+    Возвращает массив данных по серверам.
+    Returns:
+
+    """
+    logger("Запрос в базу")
+    try:
+        list_servers = execute_query("""
+                        select
+                            id,
+                            name,
+                            comment,
+                            country,
+                            speed_in_kbytes,
+                            connection_link,
+                            creation_date,
+                            standby_status
+                        from
+                            outline_servers
+                        where standby_status = True;
+                        """, fetch_one=False)
+        for server in list_servers:
+            logger(server)
+        return list_servers
+    except Exception as error:
+        logger(error)
+        sys.exit(0)

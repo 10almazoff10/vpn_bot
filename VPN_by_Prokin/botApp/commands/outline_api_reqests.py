@@ -23,6 +23,13 @@ def create_new_keys(telegram_id:str, servers_api:list):
 def remove_key(id):
     requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
 
+def remove_all_keys_on_server(API_KEY):
+    print(API_KEY)
+    response = json.loads(requests.get(f"{API_KEY}/access-keys/", verify=False).text)
+    for i in response["accessKeys"]:
+        id = i["id"]
+        remove_key(id)
+
 def get_stat():
     return json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)
 
