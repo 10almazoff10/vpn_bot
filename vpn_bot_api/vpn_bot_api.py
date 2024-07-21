@@ -99,8 +99,7 @@ def check_user(md5_hash, ip):
 
 @app.route('/conf/<md5_hash>')
 def handle_conf(md5_hash):
-    logger(request.headers["X-Forwarded-For"])
-    ip = request.remote_addr
+    ip = request.headers["X-Forwarded-For"]
     logger(f"Запрос от - {ip}")
     logger(f"Request: {md5_hash}")
     return check_user(md5_hash, ip)
