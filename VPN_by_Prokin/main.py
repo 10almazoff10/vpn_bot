@@ -200,7 +200,8 @@ def status(message):
     elif user_status == CREATE_MESSAGE_TO_SUPPORT:
         if len(message.text) < 100:
             task_id = dbcon.create_support_task(message)
-            bot.send_message(ADMIN_ID, f"Пользователь {sender_telegram_id} оставил сообщение:\n{message.text}")
+            id_user = dbcon.get_user_id(sender_telegram_id)
+            bot.send_message(ADMIN_ID, f"Пользователь {id_user} оставил сообщение:\n{message.text}")
             dbcon.set_status(message, MAIN_MENU)
             bot.send_message(sender_telegram_id, f"Ваше обращение № {task_id} зарегистрировано.",
                            reply_markup=tg_keyboard.main_keyboard())
