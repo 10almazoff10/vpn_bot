@@ -49,8 +49,7 @@ def send_welcome(message):
                          messages.hello_message,
                          reply_markup=tg_keyboard.main_keyboard())
         logger.logger(message)
-        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь
-                                            {message.from_user.id}, {message.from_user.first_name}""")
+        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь\n{message.from_user.id}, {message.from_user.first_name}""")
         dbcon.add_new_user(message)
         dbcon.set_status(message, 20)
 

@@ -87,12 +87,12 @@ def delete_all_keys_on_all_servers():
         for server in list_servers:
             logger(f"Сервер - {server[0]}")
             server_api_key = server[5]
+            print(server_api_key)
             count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
             logger(f"Удалено {count} ключей")
         logger("Очистка успешно выполнена!")
     except Exception as error:
         logger(f"Ошибка удаления:\n{error}")
-
 
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)

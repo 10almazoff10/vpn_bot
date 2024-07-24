@@ -79,9 +79,7 @@ def add_new_user(message):
     """
     telegram_id = message.from_user.id
     name = message.from_user.first_name
-    if len(name) < 15 and is_good_string(name):
-        pass
-    else:
+    if len(name) > 20:
         name = "Пользователь"
 
     dt = datetime.now()
@@ -113,11 +111,6 @@ def get_telegram_id_users():
 
     """
     return execute_query('select telegram_id from users;', False)
-def is_good_string(text):
-    # Проверяем, что строка состоит только из русских и английских букв, символов и цифр
-    allowed_characters = string.ascii_letters + string.digits + "-_., "
-    return all(char in allowed_characters for char in text)
-
 
 def check_user_indb(message):
     id = execute_query(f"select id from users where telegram_id = '{message.from_user.id}'")
