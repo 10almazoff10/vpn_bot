@@ -21,18 +21,17 @@ def create_new_keys(telegram_id:str, servers_api:list):
         requests.put(f"{API_KEY[0]}/access-keys/{id}/name", data={'name':f"{telegram_id}"}, verify=False)
     return data
 
-def remove_key(id):
+def remove_key(id, API_KEY):
     requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
 
 def remove_all_keys_on_server(API_KEY):
-    print(API_KEY)
     response = json.loads(requests.get(f"{API_KEY}/access-keys/", verify=False).text)
     count=0
     for i in response["accessKeys"]:
         count += 1
         id = i["id"]
         try:
-            remove_key(id)
+            remove_key(id, API_KEY)
         except Exception as error:
             logger(f"Ошибка удаления ключа {id}\n{error}")
     return count
