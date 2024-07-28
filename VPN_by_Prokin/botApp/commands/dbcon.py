@@ -78,7 +78,7 @@ def add_new_user(message):
 
     """
     telegram_id = message.from_user.id
-    name = message.from_user.first_name
+    name = message.from_user.username
     if len(name) > 20:
         name = "Пользователь"
 
