@@ -311,6 +311,7 @@ def status(message):
             try:
                 bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
             except Exception as error:
+                logger.logger(message_with_users, level="DEBUG")
                 bot.send_message(sender_telegram_id, str(error), parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
