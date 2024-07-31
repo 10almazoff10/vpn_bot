@@ -307,7 +307,9 @@ def status(message):
                     key = f"{key[:7]}.."
                 active = active + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
 
-            message_with_users = f"Активные пользователи: {active_count}\n{active.replace("_", "\\_")}\nЗаблокированные пользователи: {disabled_users}"
+            active = active.replace("_", "\\_")
+
+            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_users}"
             try:
                 bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
             except Exception as error:
