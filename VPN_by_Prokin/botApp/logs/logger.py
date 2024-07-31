@@ -22,7 +22,7 @@ def logger(logs, level="MAIN"):
     elif level == "DEBUG":
         dt = datetime.now()
         date = dt.strftime("%Y-%m-%d")
-        logFile = f"{LOGS_DIR}/debug-{date}.txt"
+        logFile = f"{LOGS_DIR}/debug/debug-{date}.txt"
         try:
             with open(logFile, "a", encoding='utf-8') as file:
                 dt = datetime.now()
