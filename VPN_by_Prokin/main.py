@@ -13,12 +13,12 @@ from botApp import config
 backend = Thread(target=background.run_backend)
 backend.start()
 
-### Loading config
+# Loading config
 
 API_TOKEN = config.API_KEY
 bot = telebot.TeleBot(API_TOKEN)
 
-### Payment data
+# Payment data
 
 provider_token = config.PROVIDER_TOKEN
 
@@ -31,8 +31,7 @@ shipping_options = [
     ShippingOption(id='instant', title='WorldWide Teleporter').add_price(LabeledPrice('Teleporter', 1000)),
     ShippingOption(id='pickup', title='Local pickup').add_price(LabeledPrice('Pickup', 300))]
 
-
-###Admin
+# Admin
 ADMIN_ID = config.ADMIN_ID
 
 
@@ -49,7 +48,9 @@ def send_welcome(message):
                          messages.hello_message,
                          reply_markup=tg_keyboard.main_keyboard())
         logger.logger(message)
-        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь\n{message.from_user.id}, {message.from_user.first_name}""")
+        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь\n{
+                                        message.from_user.id},{
+                                        message.from_user.first_name}""")
         dbcon.add_new_user(message)
         dbcon.set_status(message, 20)
 
@@ -71,12 +72,6 @@ def send_message(message):
         bot.send_message(message.from_user.id, "Неопознанная ошибка")
 
 
-#@bot.message_handler(commands=['auth_'])
-#def send_auth(message):
-#    dbcon.set_status(message, 10)
-#    bot.send_message(message.from_user.id, "Введите Ваш токен авторизации")
-#   dbcon.set_status(message, 11) # статус ожидания токена
-
 # Статусы
 # 10 - статус первого входа в бот
 # 11 - статус ожидания токена
@@ -85,12 +80,8 @@ def send_message(message):
 # 40 - список последних операций
 # 50 - окно управления ключами
 # 99 - админ-панель
-#
-#
-#
-#
 
-### Statuses
+# Statuses
 
 MAIN_MENU = 20
 CREATE_MESSAGE_TO_SUPPORT = 30
@@ -102,7 +93,7 @@ ADMIN_MENU = 99
 
 BROADCAST = 94
 
-### Balances
+# Balances
 
 MINIMAL_BALANCE = -5
 
@@ -114,7 +105,6 @@ def status(message):
     logger.logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
     user_status = dbcon.get_status(message)
 
-
     if user_status == MAIN_MENU:
 
         if message.text == "Баланс":
@@ -125,23 +115,23 @@ def status(message):
 
         elif message.text == "Написать в поддержку":
             dbcon.set_status(message, CREATE_MESSAGE_TO_SUPPORT)
-            bot.send_message(sender_telegram_id, "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов", reply_markup=telebot.types.ReplyKeyboardRemove())
+            bot.send_message(sender_telegram_id,
+                             "Напишите Ваше сообщение\nМаксимальная длина одного сообщения 100 символов",
+                             reply_markup=telebot.types.ReplyKeyboardRemove())
 
         elif message.text == "Пополнить":
-            user_id = dbcon.get_user_id(sender_telegram_id)
-            #bot.send_message(sender_telegram_id, f"СБП `+79635122453` Тинькофф🙂\nВ комментарии к платежу пожалуйста укажите - `{user_id}`", parse_mode="MARKDOWN")
             logger.logger(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(message.chat.id,
                              "Переход к форме оплаты...", parse_mode='Markdown')
 
             bot.send_invoice(message.chat.id,  # chat_id
-                'Доступ к VPN на 1 месяц',  # title
-                ' Самый быстрый VPN сервер',  # description
-                '00001',  # invoice_payload
-                provider_token,  # provider_token
-                'RUB',  # currency
-                prices_1, )
+                             'Доступ к VPN на 1 месяц',  # title
+                             ' Самый быстрый VPN сервер',  # description
+                             '00001',  # invoice_payload
+                             provider_token,  # provider_token
+                             'RUB',  # currency
+                             prices_1, )
 
             bot.send_invoice(
                 message.chat.id,  # chat_id
@@ -160,10 +150,6 @@ def status(message):
                 provider_token,  # provider_token
                 'RUB',  # currency
                 prices_3, )
-
-        elif message.text == "Трафик":
-            traffic = dbcon.get_user_traffic(message)
-            bot.send_message(sender_telegram_id, f"За последние 30 дней загружено `{traffic[0]}`", parse_mode="MARKDOWN")
 
         elif message.text == "Последние операции":
             dbcon.set_status(message, GET_OPERATIONS_REQUEST)
@@ -184,16 +170,17 @@ def status(message):
                 user_key = f"Ключ для подключения:\n`{key}`"
                 dbcon.set_status(message, MAIN_MENU)
                 bot.send_message(sender_telegram_id, user_key, parse_mode="MARKDOWN",
-                                     reply_markup=tg_keyboard.main_keyboard())
+                                 reply_markup=tg_keyboard.main_keyboard())
                 bot.send_message(sender_telegram_id, "Инструкция по подключению - /help")
 
             else:
                 bot.send_message(sender_telegram_id,
-                                 f"Ваш баланс менее {MINIMAL_BALANCE} рублей, пожалуйста, пополните баланс для создания нового ключа",
+                                 messages.LOW_BALANCE_MESSAGE.format(MINIMAL_BALANCE),
                                  parse_mode="MARKDOWN", reply_markup=tg_keyboard.main_keyboard())
 
         else:
-            bot.send_message(sender_telegram_id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...",
+            bot.send_message(sender_telegram_id,
+                             messages.DONT_UNDERSTAND,
                              reply_markup=tg_keyboard.main_keyboard())
 
     elif user_status == CREATE_MESSAGE_TO_SUPPORT:
@@ -203,39 +190,42 @@ def status(message):
             bot.send_message(ADMIN_ID, f"Пользователь {id_user} оставил сообщение:\n{message.text}")
             dbcon.set_status(message, MAIN_MENU)
             bot.send_message(sender_telegram_id, f"Ваше обращение № {task_id} зарегистрировано.",
-                           reply_markup=tg_keyboard.main_keyboard())
+                             reply_markup=tg_keyboard.main_keyboard())
         else:
             bot.send_message(sender_telegram_id, "Максимальная длина сообщения 100 символов.")
             dbcon.set_status(message, MAIN_MENU)
 
     elif user_status == GET_OPERATIONS_REQUEST:
+        operations_count = 0
         try:
             if len(message.text) < 5:
-                operationsCount = int(message.text)
-                if operationsCount > 30:
-                    operationsCount = 31
+                operations_count = int(message.text)
+                if operations_count > 30:
+                    operations_count = 31
             else:
                 bot.send_message(ADMIN_ID,
-                                 f"Пользователь некорректно ввел количество операций\nПользователь: {sender_telegram_id}\nТекст сообщения: {message.text}")
+                                 f"")
                 bot.send_message(sender_telegram_id, "Введено неверное количество операций",
-                             reply_markup=tg_keyboard.num_keyboard())
+                                 reply_markup=tg_keyboard.num_keyboard())
         except Exception as error:
             bot.send_message(ADMIN_ID,
-                             f"Пользователь некорректно ввел количество операций\nПользователь: {sender_telegram_id}\nТекст сообщения: {message.text}")
+                             messages.BAD_OPERATIONS_COUNT.format(sender_telegram_id, message.text))
+
             bot.send_message(sender_telegram_id,
                              "Введено неверное количество операций",
                              reply_markup=tg_keyboard.num_keyboard())
 
-        if int(operationsCount) <= 30 and int(operationsCount) > 0:
+        if int(operations_count) <= 30 and int(operations_count) > 0:
             operations_list = dbcon.get_operations_user(message, message.text)
             operations = str()
             for operation in operations_list:
                 operations = operations + f"ID операции: `{operation[0]}`\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n\n"
 
-            bot.send_message(sender_telegram_id, operations, parse_mode='MARKDOWN', reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(sender_telegram_id, operations, parse_mode='MARKDOWN',
+                             reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, MAIN_MENU)
 
-        elif int(operationsCount) > 30 or int(operationsCount) < 0:
+        elif int(operations_count) > 30 or int(operations_count) < 0:
             bot.send_message(sender_telegram_id, messages.maxOperations,
                              reply_markup=tg_keyboard.main_keyboard())
             dbcon.set_status(message, MAIN_MENU)
@@ -337,7 +327,8 @@ def status(message):
         elif message.text == "Выручка":
             money_all = dbcon.execute_query("select sum(summ) from operations where  type in (2,6)")[0]
             money_last_mounth = dbcon.execute_query(
-                "select sum(summ) from operations where type in (2,6) and operation_date > (SELECT (NOW() - interval '1 months'))")[0]
+                "select sum(summ) from operations where type in (2,6) and operation_date > (SELECT (NOW() - interval '1 months'))")[
+                0]
             bot.send_message(sender_telegram_id,
                              f"Выручка за последний месяц: {money_last_mounth} руб.\nВыручка за все время: {money_all} руб.")
 
@@ -384,7 +375,8 @@ def status(message):
             try:
                 telegram_id = dbcon.get_user_telegram_id(creds[0])[0]
                 moneyInCome = creds[1]
-                bot.send_message(telegram_id, f"Ваш баланс пополнен на {moneyInCome} руб.\nБлагодарим за сотрудничество!")
+                bot.send_message(telegram_id,
+                                 f"Ваш баланс пополнен на {moneyInCome} руб.\nБлагодарим за сотрудничество!")
                 bot.send_message(sender_telegram_id, "Сообщение успешно отправлено!",
                                  reply_markup=tg_keyboard.admin_keyboard())
                 try:
@@ -437,7 +429,7 @@ def status(message):
                 logger.logger(f"Ошибка отправки сообщения пользователю\n{error}")
 
         bot.send_message(sender_telegram_id, f"Успешно отправлено: {counter_done}\nОшибка отправки: {counter_error}",
-                                    reply_markup=tg_keyboard.admin_keyboard())
+                         reply_markup=tg_keyboard.admin_keyboard())
         dbcon.set_status(message, ADMIN_MENU)
 
 
@@ -479,7 +471,7 @@ def got_payment(message):
                              payer,
                              message.successful_payment.total_amount / 100,
                              message.successful_payment.currency),
-                             parse_mode='Markdown')
+                         parse_mode='Markdown')
 
     except Exception as error:
         logger.logger(f"Ошибка при оплате\n{error}")
