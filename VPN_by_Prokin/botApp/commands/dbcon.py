@@ -112,8 +112,8 @@ def get_telegram_id_users():
     """
     return execute_query('select telegram_id from users;', False)
 
-def check_user_indb(message):
-    id = execute_query(f"select id from users where telegram_id = '{message.from_user.id}'")
+def check_user_indb(telegram_id):
+    id = execute_query(f"select id from users where telegram_id = '{telegram_id}'")
 
     if id == None:
         return False

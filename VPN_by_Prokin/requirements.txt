@@ -4,3 +4,4 @@ psycopg2-binary
 schedule
 pyyaml
 flask
+psutil

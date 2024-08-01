@@ -103,9 +103,14 @@ schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
 def run_backend():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    logger(f"Старт бота, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH}")
+    logger(f"Запуск бекенда, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH} руб.")
     try:
-        dbcon.execute_query("select 1", fetch_one=True)
+        dbcon.execute_query(
+            "select 1",
+            fetch_one=True)
+
+        logger("Подключение к БД успешно")
+
     except Exception as error:
         logger("Ошибка подключения к БД, выход...")
         logger(error)

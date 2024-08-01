@@ -123,6 +123,7 @@ def get_outline_server_list():
         for server in list_servers:
             logger(server)
         return list_servers
+
     except Exception as error:
         logger(error)
         sys.exit(0)
