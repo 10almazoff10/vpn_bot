@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
 import telebot
+import monitoring
 from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
-from botApp.logs import logger
+from botApp.logs.logger import logger
 from backend import background
 from botApp import config
 
@@ -17,60 +18,6 @@ backend.start()
 
 API_TOKEN = config.API_KEY
 bot = telebot.TeleBot(API_TOKEN)
-
-# Payment data
-
-provider_token = config.PROVIDER_TOKEN
-
-# More about Payments: https://core.telegram.org/bots/payments
-
-prices_1 = [LabeledPrice(label='Доступ на 1 месяц', amount=7500)]
-prices_2 = [LabeledPrice(label='Доступ на 3 месяца', amount=22500)]
-prices_3 = [LabeledPrice(label='Доступ на 6 месяцев', amount=40500)]
-shipping_options = [
-    ShippingOption(id='instant', title='WorldWide Teleporter').add_price(LabeledPrice('Teleporter', 1000)),
-    ShippingOption(id='pickup', title='Local pickup').add_price(LabeledPrice('Pickup', 300))]
-
-# Admin
-ADMIN_ID = config.ADMIN_ID
-
-
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    logger.logger(f"Авторизация нового пользователя, id - {message.from_user.id}")
-    if dbcon.check_user_indb(message):
-        bot.send_message(message.from_user.id,
-                         messages.hello_message,
-                         reply_markup=tg_keyboard.main_keyboard())
-        dbcon.set_status(message, 20)
-    else:
-        bot.send_message(message.from_user.id,
-                         messages.hello_message,
-                         reply_markup=tg_keyboard.main_keyboard())
-        logger.logger(message)
-        bot.send_message(ADMIN_ID, f"""Зарегистрирован новый пользователь\n{
-                                        message.from_user.id},{
-                                        message.from_user.first_name}""")
-        dbcon.add_new_user(message)
-        dbcon.set_status(message, 20)
-
-
-@bot.message_handler(commands=['help'])
-def send_help(message):
-    bot.send_message(message.from_user.id, messages.help_message, parse_mode="MARKDOWN")
-
-
-@bot.message_handler(commands=['admin'])
-def send_message(message):
-    if message.from_user.id != ADMIN_ID:
-        bot.send_message(message.from_user.id, "Отказано в доступе")
-    elif message.from_user.id == ADMIN_ID:
-        bot.send_message(message.from_user.id, "Выполнен вход в админ-панель",
-                         reply_markup=tg_keyboard.admin_keyboard())
-        dbcon.set_status(message, ADMIN_MENU)
-    else:
-        bot.send_message(message.from_user.id, "Неопознанная ошибка")
-
 
 # Статусы
 # 10 - статус первого входа в бот
@@ -97,12 +44,96 @@ BROADCAST = 94
 
 MINIMAL_BALANCE = -5
 
+# Payment data
+
+provider_token = config.PROVIDER_TOKEN
+
+# More about Payments: https://core.telegram.org/bots/payments
+
+prices_1 = [LabeledPrice(label='Доступ на 1 месяц', amount=7500)]
+prices_2 = [LabeledPrice(label='Доступ на 3 месяца', amount=22500)]
+prices_3 = [LabeledPrice(label='Доступ на 6 месяцев', amount=40500)]
+shipping_options = [
+    ShippingOption(id='instant', title='WorldWide Teleporter').add_price(LabeledPrice('Teleporter', 1000)),
+    ShippingOption(id='pickup', title='Local pickup').add_price(LabeledPrice('Pickup', 300))]
+
+# Admin
+ADMIN_ID = config.ADMIN_ID
+
+
+@bot.message_handler(commands=['start'])
+
+# Ответ пользователю на команду START
+# Так же выполняется проверка, существует ли пользователь
+
+def send_welcome(message):
+
+# Создание переменной со значением TelegramID
+
+    sender_telegram_id = message.from_user.id
+
+    logger(
+        messages.REGISTER_NEW_USER.format(
+            sender_telegram_id))
+
+# Получение информации из БД о существовании пользователя
+# Если пользователь существует, то просто отправляется приветственное сообщение
+# Если же нет, то выполняется регистрация пользователя
+
+    if dbcon.check_user_indb(sender_telegram_id):
+
+        bot.send_message(
+            message.from_user.id,
+            messages.hello_message,
+            reply_markup=tg_keyboard.main_keyboard())
+
+        dbcon.set_status(
+            message,
+            MAIN_MENU)
+
+    else:
+        bot.send_message(
+            message.from_user.id,
+            messages.hello_message,
+            reply_markup=tg_keyboard.main_keyboard())
+
+        logger(message)
+
+        bot.send_message(
+            ADMIN_ID,
+            messages.REGISTER_NEW_USER.format(
+                message.from_user.id,
+                message.from_user.first_name))
+
+        dbcon.add_new_user(message)
+        dbcon.set_status(
+            message,
+            MAIN_MENU)
+
+
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    bot.send_message(message.from_user.id, messages.help_message, parse_mode="MARKDOWN")
+
+
+@bot.message_handler(commands=['admin'])
+def send_message(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.from_user.id, "Отказано в доступе")
+    elif message.from_user.id == ADMIN_ID:
+        bot.send_message(message.from_user.id, "Выполнен вход в админ-панель",
+                         reply_markup=tg_keyboard.admin_keyboard())
+        dbcon.set_status(message, ADMIN_MENU)
+    else:
+        bot.send_message(message.from_user.id, "Неопознанная ошибка")
+
+
 
 @bot.message_handler(func=lambda message: True)
 def status(message):
     sender_telegram_id = message.from_user.id
-    logger.logger(message, level="DEBUG")
-    logger.logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
+    logger(message, level="DEBUG")
+    logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
     user_status = dbcon.get_status(message)
 
     if user_status == MAIN_MENU:
@@ -120,7 +151,7 @@ def status(message):
                              reply_markup=telebot.types.ReplyKeyboardRemove())
 
         elif message.text == "Пополнить":
-            logger.logger(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
+            logger(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(message.chat.id,
                              "Переход к форме оплаты...", parse_mode='Markdown')
@@ -303,7 +334,7 @@ def status(message):
             try:
                 bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
             except Exception as error:
-                logger.logger(message_with_users, level="DEBUG")
+                logger(message_with_users, level="DEBUG")
                 bot.send_message(sender_telegram_id, str(error), parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
@@ -426,7 +457,7 @@ def status(message):
                 counter_done += 1
             except Exception as error:
                 counter_error += 1
-                logger.logger(f"Ошибка отправки сообщения пользователю\n{error}")
+                logger(f"Ошибка отправки сообщения пользователю\n{error}")
 
         bot.send_message(sender_telegram_id, f"Успешно отправлено: {counter_done}\nОшибка отправки: {counter_error}",
                          reply_markup=tg_keyboard.admin_keyboard())
@@ -474,7 +505,7 @@ def got_payment(message):
                          parse_mode='Markdown')
 
     except Exception as error:
-        logger.logger(f"Ошибка при оплате\n{error}")
+        logger(f"Ошибка при оплате\n{error}")
         bot.send_message(ADMIN_ID, f'Не удалось зачислить платеж пользователя {telegram_id} на сумму {summ}')
         bot.send_message(message.chat.id,
                          'Ошибка платежа, информация передана разработчикам, в ближайшее время деньги будут зачислены в размере `{} {}`'.format(
@@ -489,5 +520,8 @@ def echo_message(message):
     dbcon.set_status(message, 20)
 
 
-logger.logger("Запуск бота...")
-bot.infinity_polling()
+logger("Запуск приложения бота")
+logger(monitoring.SystemInfo().to_json())
+
+if __name__ == "__main__":
+    bot.infinity_polling()
