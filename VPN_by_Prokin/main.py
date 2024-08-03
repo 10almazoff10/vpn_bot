@@ -35,7 +35,6 @@ CREATE_MESSAGE_TO_SUPPORT = 30
 GET_OPERATIONS_REQUEST = 40
 PROMO_CODE = 60
 CHECK_KEYS = 50
-DONT_HAVE_KEYS = 51
 ADMIN_MENU = 99
 
 BROADCAST = 94
@@ -250,10 +249,19 @@ def status(message):
             operations_list = dbcon.get_operations_user(message, message.text)
             operations = str()
             for operation in operations_list:
-                operations = operations + f"ID операции: `{operation[0]}`\nСумма: {operation[1]} руб.\nДата: {operation[2]}\nТип операции: {operation[3]}\n\n"
+                operations = operations + messages.LIST_OPERATIONS.format(
+                    operation[0],
+                    operation[1],
+                    operation[2],
+                    operation[3]
+                )
 
-            bot.send_message(sender_telegram_id, operations, parse_mode='MARKDOWN',
-                             reply_markup=tg_keyboard.main_keyboard())
+            bot.send_message(
+                sender_telegram_id,
+                operations,
+                parse_mode='MARKDOWN',
+                reply_markup=tg_keyboard.main_keyboard())
+
             dbcon.set_status(message, MAIN_MENU)
 
         elif int(operations_count) > 30 or int(operations_count) < 0:
@@ -262,55 +270,17 @@ def status(message):
             dbcon.set_status(message, MAIN_MENU)
 
         else:
-            bot.send_message(sender_telegram_id, messages.notUnderstand,
-                             reply_markup=tg_keyboard.main_keyboard())
-            dbcon.set_status(message, MAIN_MENU)
+            bot.send_message(
+                sender_telegram_id,
+                messages.notUnderstand,
+                reply_markup=tg_keyboard.main_keyboard())
 
-    elif user_status == DONT_HAVE_KEYS:
-        if message.text == "Да":
-            bot.send_message(sender_telegram_id, "Выполняется регистрация ключа...")
-            user_key = dbcon.get_user_vpn_key(sender_telegram_id)
-            bot.send_message(sender_telegram_id, user_key, parse_mode="MARKDOWN",
-                             reply_markup=tg_keyboard.main_keyboard())
-            bot.send_message(sender_telegram_id, "Информацию по активации ключа можно получить в команде /help",
-                             reply_markup=tg_keyboard.main_keyboard())
-            dbcon.set_status(message, MAIN_MENU)
-
-
-        elif message.text == "Нет":
-            bot.send_message(sender_telegram_id, "Отмена...", reply_markup=tg_keyboard.main_keyboard())
-            dbcon.set_status(message, MAIN_MENU)
-
-    elif user_status == PROMO_CODE:
-        if message.text == "Реферальный код":
-            bot.send_message(sender_telegram_id, "В разработке", reply_markup=tg_keyboard.make_money())
-
-        elif message.text == "Задания":
-            bot.send_message(sender_telegram_id, "В разработке", reply_markup=tg_keyboard.make_money())
-
-        elif message.text == "Колесо фортуны":
-            keyboard = telebot.types.InlineKeyboardMarkup()
-            url_button = telebot.types.InlineKeyboardButton(text="Крутить колесо", url="http://185.246.118.85")
-            keyboard.add(url_button)
-            bot.send_message(message.chat.id, "Крутить колесо!", reply_markup=keyboard)
-
-            bot.send_message(sender_telegram_id, "В разработке", reply_markup=tg_keyboard.make_money())
-
-        elif message.text == "Пост в соц.сети":
-            bot.send_message(sender_telegram_id, "В разработке", reply_markup=tg_keyboard.make_money())
-
-        elif message.text == "Вернуться":
-            bot.send_message(sender_telegram_id, "Переход в главное меню", reply_markup=tg_keyboard.main_keyboard())
-            dbcon.set_status(message, MAIN_MENU)
-
-        else:
-            dbcon.set_status(message, MAIN_MENU)
-            bot.send_message(sender_telegram_id, "Не понял Вас, воспользуйтесь /help\nВозвращение в главное меню...",
-                             reply_markup=tg_keyboard.main_keyboard())
-
-
+            dbcon.set_status(
+                message,
+                MAIN_MENU)
 
     elif user_status == ADMIN_MENU:
+
         if message.text == "Пользователи":
             active_users, disabled_users = dbcon.get_list_users_with_state()
             active = str()
@@ -330,12 +300,26 @@ def status(message):
 
             active = active.replace("_", "\\_")
 
-            message_with_users = f"Активные пользователи: {active_count}\n{active}\nЗаблокированные пользователи: {disabled_users}"
+            message_with_users = messages.LIST_USERS.format(
+                active_count,
+                active,
+                disabled_users)
+
             try:
-                bot.send_message(sender_telegram_id, message_with_users, parse_mode="MARKDOWN")
+                bot.send_message(
+                    sender_telegram_id,
+                    message_with_users,
+                    parse_mode="MARKDOWN")
+
             except Exception as error:
-                logger(message_with_users, level="DEBUG")
-                bot.send_message(sender_telegram_id, str(error), parse_mode="MARKDOWN")
+                logger(
+                    message_with_users,
+                    level="DEBUG")
+
+                bot.send_message(
+                    sender_telegram_id,
+                    str(error),
+                    parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
             dbcon.set_status(message, 20)
