@@ -1,4 +1,7 @@
 #!/bin/bash
+
+source ~/.env/bin/activate
+
 cd VPN_by_Prokin
 pip install -r requirements.txt
 
