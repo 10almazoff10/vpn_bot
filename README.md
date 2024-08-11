@@ -1,2 +1,2 @@
-# vpn_bot - GreatVPN
+# GreatVPN - Администрирование сервиса VPN
 
