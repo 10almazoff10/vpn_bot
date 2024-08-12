@@ -5,9 +5,9 @@ After=syslog.target network.target.
 [Service]
 #Type=forking
 User=root
-
-WorkingDirectory=/root/vpnbot/VPN_by_Prokin
-ExecStart=/bin/bash run.sh
+Type=simple
+WorkingDirectory=/root/vpn-bot
+ExecStart=/root/vpn-bot/vpn-bot-develop
 ExecStop=/bin/kill -15 $MAINPID
 
 [Install]
