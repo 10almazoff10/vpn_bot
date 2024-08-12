@@ -1,0 +1,14 @@
+[Unit]
+Description=VPN-api
+After=syslog.target network.target.
+
+[Service]
+#Type=forking
+User=root
+Type=simple
+WorkingDirectory=/root/vpn-bot/api
+ExecStart=/root/vpn-bot/api/vpn-bot-api
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
