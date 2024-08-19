@@ -103,7 +103,7 @@ def check_user(md5_hash, ip):
 
         elif user_state == False:
             return jsonify({"error":
-                                {"message": "Ключ заблокирован, пожалуйста пополните баланс"}})
+                                {"message": "Key is blocked"}})
     else:
         return Response("Вы не авторизованы!", 401)
 
