@@ -1,3 +1,17 @@
+### 2.0.0 20.08.2024
+- Реализован функционал одновременно динамических и статических ключей
+- Множественные улучшения кода с визуальной точки зрения
+
+```sql
+ALTER TABLE public.users_vpn_keys ADD "method" text NULL;
+ALTER TABLE public.users_vpn_keys ADD "password" text NULL;
+ALTER TABLE public.users_vpn_keys ADD CONSTRAINT users_vpn_keys_unique UNIQUE ("password");
+ALTER TABLE public.users_vpn_keys ADD "server" text NULL;
+ALTER TABLE public.users_vpn_keys ADD server_port int NULL;
+ALTER TABLE public.users_vpn_keys ADD server_id int NULL;
+
+```
+
 ### 1.5.0 02.08.2024
 - Улучение визуальности кода
 - Добавлен класс monitoring, для получения информации о системе во время запуска
