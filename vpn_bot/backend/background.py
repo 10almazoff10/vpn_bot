@@ -91,19 +91,19 @@ def send_day_stat():
     bot.send_message(ADMIN_ID, f"За последние сутки обработано {connection_count} коннектов")
 
 
-def delete_all_keys_on_all_servers():
-    list_servers = dbcon.get_outline_server_list()
-    logger("Запущен процесс удаления старых ключей")
-    try:
-        for server in list_servers:
-            logger(f"Сервер - {server[0]}")
-            server_api_key = server[5]
-            print(server_api_key)
-            count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
-            logger(f"Удалено {count} ключей")
-        logger("Очистка успешно выполнена!")
-    except Exception as error:
-        logger(f"Ошибка удаления:\n{error}")
+#def delete_all_keys_on_all_servers():
+#    list_servers = dbcon.get_outline_server_list()
+#    logger("Запущен процесс удаления старых ключей")
+#    try:
+#        for server in list_servers:
+#            logger(f"Сервер - {server[0]}")
+#            server_api_key = server[5]
+#            print(server_api_key)
+#            count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
+#            logger(f"Удалено {count} ключей")
+#        logger("Очистка успешно выполнена!")
+#    except Exception as error:
+#        logger(f"Ошибка удаления:\n{error}")
 
 
 def check_users_keys():
@@ -145,10 +145,6 @@ def run_backend():
         sys.exit(1)
 
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
-
-    delete_all_keys_on_all_servers()
-
-    check_users_keys()
 
     while True:
         schedule.run_pending()
