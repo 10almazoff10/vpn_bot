@@ -62,4 +62,5 @@ def get_state_key():
     markup.row_width = 2
     markup.add(
         InlineKeyboardButton("Статический ключ", callback_data="get_stat_key")
+    )
     return markup
