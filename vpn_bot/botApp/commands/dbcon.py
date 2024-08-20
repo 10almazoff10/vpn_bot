@@ -93,6 +93,60 @@ def add_new_user(message):
     insert_in_db(
         f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
 
+def reg_user_keys(telegram_id):
+    """
+    Регистрирует ключи на всех доступных серверах из пула
+    Args:
+        telegram_id:
+
+    Returns:
+        True, False
+    """
+    server_list = get_outline_server_list(only_connection_link=True)
+
+    key_list = outline.create_new_keys(telegram_id, server_list)
+
+    logger(key_list)
+
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        for key in key_list:
+            insert_in_db(
+                f"""
+                INSERT INTO users_vpn_keys
+                (
+                    key_id,
+                    telegram_id,
+                    access_url,
+                    date_reg,
+                    method,
+                    server_port,
+                    password,
+                    server,
+                    server_id
+                )
+                VALUES
+                (
+                    '{key[0]}',
+                    '{telegram_id}',
+                    '{key[2]}',
+                    '{date}',
+                    '{key[5]}',
+                    '{key[4]}',
+                    '{key[3]}',
+                    '{key[6]}',
+                    '{key[7]}'
+                )
+                """)
+        return True
+
+    except Exception as error:
+        logger("Ошибка добавление ключей в БД\n" + str(error))
+        return False
+
+
 def get_user_id(telegram_id):
     """
     Получение внутреннего id пользователя
@@ -184,7 +238,7 @@ def get_user_vpn_key(telegram_id):
         user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
 
 
-    user_key = f"ssconf://devblog.space:443/conf/{user_token}"
+    user_key = "ssconf://devblog.space:443/conf/{}".format(user_token)
     return user_key
 
 
@@ -227,6 +281,7 @@ def get_list_users_with_state():
     Получение информации о пользователях
     Returns:
     Возвращает список пользователей и их трафик
+    active_users, disabled_users
     """
     active_users = execute_query("""select
                                             name,
@@ -249,20 +304,56 @@ def get_list_users_with_state():
                                         where
                                             user_state = 1""",
                                     fetch_one=False)[0]
-    return active_users, disabled_users
+    return active_users, disabled_users[0]
 
 
 def add_money_to_user_from_buffer(message):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(
-        f"insert into operations (summ, type, operation_date, user_id) values ((select summ from operation_buffer), 2, '{date}', (select user_id from operation_buffer))")
+        f"""
+        insert
+            into
+            operations (summ,
+            type,
+            operation_date,
+            user_id)
+        values ((
+        select
+            summ
+        from
+            operation_buffer),
+        2,
+        '{date}',
+        (
+        select
+            user_id
+        from
+            operation_buffer))
+        """)
 
 def add_money_to_user_from_pay_form(telegram_id, summ):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(
-        f"insert into operations (summ, type, operation_date, user_id) values ({summ}, 6, '{date}', (select id from users where telegram_id = '{telegram_id}'))")
+        f"""
+        insert
+            into
+            operations (summ,
+            type,
+            operation_date,
+            user_id)
+        values ({summ},
+        6,
+        '{date}',
+        (
+        select
+            id
+        from
+            users
+        where
+            telegram_id = '{telegram_id}'))
+        """)
 
 
 def get_user_telegram_id(id):
@@ -327,31 +418,148 @@ def get_users_stats():
                                 """,
                                  fetch_one=False)
 
-def get_outline_server_list():
+def get_outline_server_list(only_connection_link=False):
     """
     Возвращает массив данных по серверам.
     Returns:
 
     """
     logger("Запрос в базу")
+
+    if only_connection_link:
+        try:
+            list_servers = execute_query(
+                """
+                select
+                    id,
+                    connection_link
+                from
+                    outline_servers
+                where standby_status = True;
+                """,
+                fetch_one=False)
+            for server in list_servers:
+                logger(server)
+            return list_servers
+        except Exception as error:
+            logger(error)
+            sys.exit(1)
+
     try:
-        list_servers = execute_query("""
-                        select
-                            id,
-                            name,
-                            comment,
-                            country,
-                            speed_in_kbytes,
-                            connection_link,
-                            creation_date,
-                            standby_status
-                        from
-                            outline_servers
-                        where standby_status = True;
-                        """, fetch_one=False)
+        list_servers = execute_query(
+            """
+             select
+                id,
+                name,
+                comment,
+                country,
+                speed_in_kbytes,
+                connection_link,
+                creation_date
+            from
+                outline_servers
+            where standby_status = True;
+            """,
+            fetch_one=False)
         for server in list_servers:
             logger(server)
         return list_servers
+
     except Exception as error:
         logger(error)
-        sys.exit(0)
+        sys.exit(1)
+
+def get_active_users_without_keys():
+    active_users, disabled_users = get_list_users_with_state()
+
+    list_users = []
+    for users in active_users:
+        list_users.append(users[1])
+
+    created_users = execute_query(
+        """
+        SELECT DISTINCT
+            telegram_id
+        FROM
+            users_vpn_keys;
+        """,
+        fetch_one=False)
+    if created_users == []:
+        created_users.append('NoData')
+
+    return_users = []
+    for telegram_id in list_users:
+        if telegram_id not in created_users[0]:
+            return_users.append(telegram_id)
+            reg_user_keys(telegram_id)
+            logger(
+                "Зарегистрированы ключи для пользователя {}".format(
+                    telegram_id))
+    return return_users
+
+def get_user_state_vpn_key(telegram_id):
+    """
+    Функция получает случайный ключ пользователя из БД
+    Args:
+        telegram_id:
+
+    Returns:
+    key
+    """
+    return execute_query(
+        f"""
+        SELECT 
+            access_url 
+        FROM
+            users_vpn_keys
+        WHERE 
+            telegram_id = '{telegram_id}'
+        ORDER BY random() 
+        LIMIT 1;
+        """)[0]
+
+def delete_all_users_keys(telegram_id):
+    user_keys = []
+    try:
+        user_keys = execute_query(
+            """
+            select
+                uvk.key_id,
+                os.connection_link
+            from
+                users_vpn_keys uvk
+            left join outline_servers os on
+                uvk.server_id = os.id
+            where
+                telegram_id = '{}';
+            """.format(telegram_id), fetch_one=False)
+    except Exception as error:
+        logger("Не удается получить информацию о ключах из БД\n" + str(error))
+        return False
+
+    try:
+        for data in user_keys:
+            key_id = data[0]
+            API_KEY = data[1]
+            outline.remove_key(
+                key_id,
+                API_KEY)
+    except Exception as error:
+        logger("Ошибка удаления ключей с серверов \n" + str(error))
+        return False
+
+    try:
+        insert_in_db(
+            """
+            delete
+            from
+                users_vpn_keys
+            where
+                telegram_id = '{}';
+            """.format(telegram_id))
+        return True
+
+    except Exception as error:
+        logger("Не удается удалить ключи из БД \n" + str(error))
+        return False
+

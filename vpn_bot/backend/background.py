@@ -55,13 +55,24 @@ def send_give_price():
         elif float(user[1]) <= float(-5):
             telegram_id = user[0]
             dbcon.insert_in_db(f"update users set user_state = 1 where telegram_id = '{telegram_id}';")
-            bot.send_message(ADMIN_ID, f"Блокирую пользователя {user[0]}")
-            try:
-                bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет.")
-                bot.send_message(ADMIN_ID, f"Пользователь заблокирован {user[0]}")
-            except Exception as error:
-                bot.send_message(ADMIN_ID, f"Ошибка удаления пользователя {user[0]}\n{error}")
-            
+            if dbcon.delete_all_users_keys(telegram_id):
+                bot.send_message(
+                    ADMIN_ID,
+                    "Пользователь {} заблокирован, отправляю сообщение".format(
+                        user[0]
+                    )
+                )
+                try:
+                    bot.send_message(user[0], "Доступ заблокирован, для восстановления доступа пополните счет.")
+                except Exception as error:
+                    bot.send_message(
+                        ADMIN_ID,
+                        f"Ошибка отправки сообщения пользователю {user[0]}\n{error}")
+            else:
+                bot.send_message(
+                    ADMIN_ID,
+                    "Ошибка удаления ключей пользователя {}".format(
+                        user[3]))
 def update_balance():    
     dbcon.calc_balances()
     logger("Просчитываем баланс пользователей...")
@@ -94,11 +105,27 @@ def delete_all_keys_on_all_servers():
     except Exception as error:
         logger(f"Ошибка удаления:\n{error}")
 
+
+def check_users_keys():
+    bot.send_message(ADMIN_ID, "Проверка наличия ключей у пользователей")
+    telegram_id_without_keys = dbcon.get_active_users_without_keys()
+
+    if telegram_id_without_keys != []:
+        bot.send_message(
+            ADMIN_ID,
+            "Зарегистрированы ключи для пользователей - \n".format(
+                telegram_id_without_keys))
+    else:
+        bot.send_message(
+            ADMIN_ID,
+            "У всех пользователей есть ключи")
+
+
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("10:30").do(send_day_stat)
-schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
+#schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
 
 def run_backend():
     dt = datetime.now()
@@ -115,10 +142,11 @@ def run_backend():
         logger("Ошибка подключения к БД, выход...")
         logger(error)
         bot.send_message(ADMIN_ID, f"Ошибка подключения к БД, {error}")
-
         sys.exit(1)
 
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
+
+    check_users_keys()
 
     while True:
         schedule.run_pending()
