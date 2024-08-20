@@ -6,6 +6,9 @@ import re
 import dbcon
 import outline_api_requests
 from logs.logger import logger
+import config
+
+API_PORT = config.API_PORT
 
 #962fd229312b115fe5fb7b6d0b343a58
 SALT = "ProkinVPN"
@@ -121,21 +124,8 @@ def handle_conf(md5_hash):
 
 
 
-def check_number():
-    # Получение данных из POST запроса
-    return jsonify({
-        "server": server,
-        "server_port": server_port,
-        "password": password,
-        "method": method
-    })
-
 def run_api():
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    app.run(host="127.0.0.1", port=API_PORT, debug=False)
 
 if __name__ == "__main__":
     run_api()
-
-# Примечание: Этот код требует установленного Flask и запустит локальный сервер.
-# Пользователь может отправить POST запрос с JSON телом {"number": 1} на эндпоинт /check_number,
-# чтобы получить ответ {"result": true}.

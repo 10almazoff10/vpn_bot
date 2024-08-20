@@ -16,6 +16,8 @@ DB_USER = config.DB_USER
 DB_PASS = config.DB_PASS
 DB_HOST = config.DB_HOST
 DB_PORT = config.DB_PORT
+SALT = config.SALT
+API_HOST = config.API_HOST
 
 logger(f"Инициализация подключения к БД...")
 logger(f"{DB_HOST}, {DB_USER}, {DB_NAME}")
@@ -238,7 +240,7 @@ def get_user_vpn_key(telegram_id):
         user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
 
 
-    user_key = "ssconf://devblog.space:443/conf/{}".format(user_token)
+    user_key = "ssconf://{}/conf/{}".format(API_HOST, user_token)
     return user_key
 
 
@@ -269,7 +271,6 @@ def get_all_outline_servers():
     return links
 
 def gen_crypted_data(telegram_id:str) -> str:
-    SALT = "ProkinVPN"
     crypt = MD5(SALT + str(telegram_id))
     return crypt.encrypt()
 
