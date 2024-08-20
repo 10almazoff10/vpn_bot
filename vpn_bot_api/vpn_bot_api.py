@@ -10,7 +10,6 @@ import config
 
 API_PORT = config.API_PORT
 
-#962fd229312b115fe5fb7b6d0b343a58
 SALT = config.SALT
 
 app = Flask(__name__)
@@ -27,40 +26,10 @@ def get_key_for_user(telegram_id):
     logger("Выдаем пользователю случайный ключ")
     try:
         key_data = dbcon.get_random_user_key(telegram_id)
-        logger(f"Ключ получен: {key_data}")
+        logger(f"Ключ получен: {key_data[0]}")
         return key_data
     except Exception as error:
         logger("Ошибка получения ключа из БД\n" + str(error))
-
-def extract_data(key_url):
-    # Регулярное выражение для извлечения данных из строке
-    pattern = r'ss://(.+):(\d+)/?(\?.*)'
-    match = re.match(pattern, key_url)
-
-    if match:
-        # Извлечение хоста и порта
-        host_port = match.group(1).split('@')
-        server = host_port[0]
-        port = int(host_port[1].split(':')[0])
-
-        # Извлечение decode_data
-        decoded_text = str(base64.b64decode(match.group(1).split('ss://')[1]))
-
-        # Извлечение password и method из decode_data
-        data_parts = decoded_text.split(':')
-        if len(data_parts) >= 2:
-            password = data_parts[1]
-            method = data_parts[0]
-
-        return {
-            'server': server,
-            'port': port,
-            'decoded_text': decoded_text,
-            'password': password,
-            'method': method
-        }
-    else:
-        return None
 
 def check_user(md5_hash, ip):
     logger("Проверка авторизации...")
