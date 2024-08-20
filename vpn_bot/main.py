@@ -62,7 +62,7 @@ ADMIN_ID = config.ADMIN_ID
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     print(call)
-    if call.data == "cb_yes":
+    if call.data == "get_state_key":
         bot.answer_callback_query(
             call.id,
             "Получаем ключ...")
@@ -230,10 +230,6 @@ def status(message):
             bot.send_message(sender_telegram_id, "Введите количество операций:",
                              reply_markup=tg_keyboard.num_keyboard())
 
-        elif message.text == "Заработать":
-            dbcon.set_status(message, PROMO_CODE)
-            bot.send_message(sender_telegram_id, "Переход...", reply_markup=tg_keyboard.make_money())
-
         elif message.text == "Ключ VPN":
 
             if dbcon.get_user_balance(sender_telegram_id) > MINIMAL_BALANCE:
@@ -269,7 +265,7 @@ def status(message):
                     sender_telegram_id,
                     messages.GET_STATE_KEY,
                     parse_mode="MARKDOWN",
-                    reply_markup=tg_keyboard.make_money())
+                    reply_markup=tg_keyboard.get_state_key())
 
             else:
                 bot.send_message(sender_telegram_id,

@@ -57,10 +57,9 @@ def yes_or_no_keyboard():
     keyboard.add(button1, button2)
     return keyboard
 
-def make_money():
+def get_state_key():
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
     markup.add(
-        InlineKeyboardButton("Yes", callback_data="cb_yes"),
-        InlineKeyboardButton("No", callback_data="cb_no"))
+        InlineKeyboardButton("Статический ключ", callback_data="get_stat_key")
     return markup
