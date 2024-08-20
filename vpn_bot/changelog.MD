@@ -3,6 +3,8 @@
 - Множественные улучшения кода с визуальной точки зрения
 
 ```sql
+TRUNCATE users_vpn_keys;
+ALTER TABLE public.users_vpn_keys RENAME COLUMN user_name TO telegram_id;
 ALTER TABLE public.users_vpn_keys ADD "method" text NULL;
 ALTER TABLE public.users_vpn_keys ADD "password" text NULL;
 ALTER TABLE public.users_vpn_keys ADD CONSTRAINT users_vpn_keys_unique UNIQUE ("password");
