@@ -69,10 +69,18 @@ def callback_query(call):
 
         state_key = dbcon.get_user_state_vpn_key(call.from_user.id)
 
+        server = state_key[0]
+        server_port = state_key[1]
+        method = state_key[2]
+        password = [state_key]
+
         bot.send_message(
             call.from_user.id,
             messages.SEND_STATE_KEY.format(
-                state_key),
+                server,
+                server_port,
+                method,
+                password),
             parse_mode="MARKDOWN")
 
     elif call.data == "cb_no":

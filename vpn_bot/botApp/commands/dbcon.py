@@ -503,6 +503,10 @@ def get_user_state_vpn_key(telegram_id):
     Функция получает случайный ключ пользователя из БД
     Args:
         telegram_id:
+        {} - IP сервера
+        {} - Порт
+        {} - Метод шифрования
+        {} - Пароль
 
     Returns:
     key
@@ -510,7 +514,10 @@ def get_user_state_vpn_key(telegram_id):
     return execute_query(
         f"""
         SELECT 
-            access_url 
+            server,
+            server_port,
+            method,
+            password 
         FROM
             users_vpn_keys
         WHERE 
