@@ -6,9 +6,11 @@ import os
 LOGS_DIR = config.LOGS_DIR
 # Логгер для отладки
 def logger(logs, level="MAIN"):
+    dt = datetime.now()
+    date = dt.strftime("%Y-%m-%d")
+
     if level == "MAIN":
-        dt = datetime.now()
-        date = dt.strftime("%Y-%m-%d")
+
         logFile = f"{LOGS_DIR}/telebot-{date}.txt"
         try:
             with open(logFile, "a", encoding='utf-8') as file:
@@ -20,8 +22,7 @@ def logger(logs, level="MAIN"):
             print(error)
 
     elif level == "DEBUG":
-        dt = datetime.now()
-        date = dt.strftime("%Y-%m-%d")
+
         logFile = f"{LOGS_DIR}/debug/debug-{date}.txt"
         try:
             with open(logFile, "a", encoding='utf-8') as file:

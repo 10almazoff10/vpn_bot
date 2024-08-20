@@ -14,16 +14,24 @@ def get_all_api_keys():
 def create_new_keys(telegram_id:str, servers_api:list):
     data = []
     for API_KEY in servers_api:
-        response = json.loads(requests.post(f"{API_KEY[0]}/access-keys", verify=False).text)
+        response = json.loads(requests.post(f"{API_KEY[1]}/access-keys", verify=False).text)
         id = response["id"]
         accessUrl = response["accessUrl"]
-        data.append([id, accessUrl])
-        requests.put(f"{API_KEY[0]}/access-keys/{id}/name", data={'name':f"{telegram_id}"}, verify=False)
+        password = response["password"]
+        server_port = response["port"]
+        method = response["method"]
+        ip = accessUrl.split("@")[1].split(":")[0]
+        server_id = API_KEY[0]
+        data.append([id, telegram_id, accessUrl, password, server_port, method, ip, server_id])
+        requests.put(f"{API_KEY[1]}/access-keys/{id}/name", data={'name':f"{telegram_id}"}, verify=False)
     return data
 
 def remove_key(id, API_KEY):
-    requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
-
+    try:
+        logger("Удаление ключа {} {}".format(id, API_KEY))
+        requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
+    except Exception as error:
+        logger("Ошибка удаления \n" + str(error))
 def remove_all_keys_on_server(API_KEY):
     response = json.loads(requests.get(f"{API_KEY}/access-keys/", verify=False).text)
     count=0

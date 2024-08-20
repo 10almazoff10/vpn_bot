@@ -2,12 +2,15 @@ import sys
 
 from flask import Flask, jsonify, Response, request
 import base64
+import re
 import dbcon
 import outline_api_requests
 from logs.logger import logger
+import config
 
-#962fd229312b115fe5fb7b6d0b343a58
-SALT = "ProkinVPN"
+API_PORT = config.API_PORT
+
+SALT = config.SALT
 
 app = Flask(__name__)
 
@@ -19,45 +22,15 @@ def check_user_state(telegram_id):
     elif user_balance <= -5:
         return False
 
-
-def get_api_key_for_great_server():
-    logger("Получение списка серверов...")
-    try:
-        servers = dbcon.get_outline_server_list()
-    except Exception as error:
-        logger("Ошибка получения списка серверов\n" + error)
-        sys.exit(1)
-    count_servers = len(servers)
-    logger(f"Доступно серверов: {count_servers}")
-    data = []
-    for server in servers:
-        server_id = server[0]
-        server_api_key = server[5]
-        try:
-            outline_responce = outline_api_requests.get_count_active_keys(server[5])
-            count_keys = len(outline_responce['accessKeys'])
-            data.append([count_keys, server_id, server_api_key])
-        except Exception as error:
-            logger(f"Ошибка подключения к серверу {server[0]}\n{error}")
-
-
-    data.sort()
-    great_server_id=data[0][1]
-    logger(f"ID оптимального сервера: {great_server_id}")
-    api_key_for_great_server=data[0][2]
-    logger(api_key_for_great_server)
-    return api_key_for_great_server
 def get_key_for_user(telegram_id):
-    logger("Определение оптимального сервера...")
-    api_key_for_great_server = get_api_key_for_great_server()
-    logger("Регистрация ключа для авторизации пользователя...")
+    logger("Выдаем пользователю случайный ключ")
     try:
-        key = outline_api_requests.create_new_key(telegram_id, api_key_for_great_server) # id, accessUrl, user_password, port, method
-        key_url = key[0][1]
-        logger(f"Ключ получен: {key_url}")
-        return key_url
+        key_data = dbcon.get_random_user_key(telegram_id)
+        logger(f"Ключ получен: {key_data[0]}")
+        return key_data
     except Exception as error:
-        logger(f"Ошибка получения ключа:\n{error}")
+        logger("Ошибка получения ключа из БД\n" + str(error))
+
 def check_user(md5_hash, ip):
     logger("Проверка авторизации...")
     try:
@@ -76,24 +49,33 @@ def check_user(md5_hash, ip):
 
     if find_hash:
         telegram_id = dbcon.get_telegram_id_user_from_hash(md5_hash)
-        logger(f"Подключается пользователь {telegram_id}")
-        dbcon.write_stat(telegram_id, ip, "connect")
+        logger(
+            "Подключается пользователь {}".format(
+                telegram_id))
 
-        user_state = check_user_state(telegram_id)
+        dbcon.write_stat(
+            telegram_id=telegram_id,
+            ip=ip,
+            stat_name="connect")
+
+        user_state = check_user_state(
+            telegram_id)
+
         if user_state:
-            logger("Пользователь не заблокирован, создание ключа...")
-            key_url = get_key_for_user(telegram_id)
+            logger("Пользователь не заблокирован, выдаем ключ...")
 
-            server = key_url.split("@")[1].split(":")[0]
-            server_port = key_url.split("@")[1].split(":")[1].split("/")[0]
-            decode_data = str(base64.b64decode(key_url.split("@")[0].split("//")[1]))
-            password = decode_data.split("'")[1].split(":")[1]
-            method = decode_data.split("'")[1].split(":")[0]
+            key_data = get_key_for_user(telegram_id)
 
             logger("Ключ отправлен...")
-            return jsonify({"server": server, "server_port": server_port, "password": password, "method": method})
+            return jsonify({
+                "server": key_data[0],
+                "server_port": key_data[1],
+                "password": key_data[2],
+                "method": key_data[3]})
+
         elif user_state == False:
-            return jsonify({"message": "Ключ заблокирован, пожалуйста пополните баланс"})
+            return jsonify({"error":
+                                {"message": "Key is blocked"}})
     else:
         return Response("Вы не авторизованы!", 401)
 
@@ -111,16 +93,8 @@ def handle_conf(md5_hash):
 
 
 
-def check_number():
-    # Получение данных из POST запроса
-    return jsonify({"server": server, "server_port": server_port, "password": password, "method": method})
-
 def run_api():
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    app.run(host="127.0.0.1", port=API_PORT, debug=False)
 
 if __name__ == "__main__":
     run_api()
-
-# Примечание: Этот код требует установленного Flask и запустит локальный сервер.
-# Пользователь может отправить POST запрос с JSON телом {"number": 1} на эндпоинт /check_number,
-# чтобы получить ответ {"result": true}.

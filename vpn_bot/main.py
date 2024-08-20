@@ -6,7 +6,7 @@ from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
-from botApp.logs.logger import logger
+from botApp.logs.logger import logger, get_file_log
 from backend import background
 from botApp import config
 
@@ -59,6 +59,40 @@ shipping_options = [
 # Admin
 ADMIN_ID = config.ADMIN_ID
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    print(call)
+    if call.data == "get_state_key":
+        bot.answer_callback_query(
+            call.id,
+            "Получаем ключ...")
+
+        state_key = dbcon.get_user_state_vpn_key(call.from_user.id)
+
+        server = state_key[0]
+        server_port = state_key[1]
+        method = state_key[2]
+        password = state_key[3]
+
+        bot.send_message(
+            call.from_user.id,
+            messages.SEND_STATE_KEY.format(
+                server,
+                server_port,
+                method,
+                password),
+            parse_mode="MARKDOWN")
+
+    elif call.data == "cb_no":
+
+        bot.answer_callback_query(
+            call.id,
+            messages.GO_TO_MAIN)
+
+        bot.send_message(
+            call.from_user.id,
+            messages.GO_TO_MAIN,
+            reply_markup=tg_keyboard.main_keyboard())
 
 @bot.message_handler(commands=['start'])
 
@@ -104,7 +138,22 @@ def send_welcome(message):
                 message.from_user.id,
                 message.from_user.first_name))
 
+        # Создание пользователя в БД
         dbcon.add_new_user(message)
+
+        # Регистрация пользовательски ключей на доступном в данный момент
+        # пуле серверов
+
+        if dbcon.reg_user_keys(sender_telegram_id):
+            logger(
+                messages.REG_KEYS_TRUE.format(
+                    sender_telegram_id))
+        else:
+            bot.send_message(
+                ADMIN_ID,
+                messages.REG_KEYS_FALSE.format(
+                    sender_telegram_id))
+
         dbcon.set_status(
             message,
             MAIN_MENU)
@@ -112,7 +161,10 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['help'])
 def send_help(message):
-    bot.send_message(message.from_user.id, messages.help_message, parse_mode="MARKDOWN")
+    bot.send_message(
+        message.from_user.id,
+        messages.help_message,
+        parse_mode="MARKDOWN")
 
 
 @bot.message_handler(commands=['admin'])
@@ -186,22 +238,42 @@ def status(message):
             bot.send_message(sender_telegram_id, "Введите количество операций:",
                              reply_markup=tg_keyboard.num_keyboard())
 
-        elif message.text == "Заработать":
-            dbcon.set_status(message, PROMO_CODE)
-            bot.send_message(sender_telegram_id, "Переход...", reply_markup=tg_keyboard.make_money())
-
         elif message.text == "Ключ VPN":
 
             if dbcon.get_user_balance(sender_telegram_id) > MINIMAL_BALANCE:
 
-                dbcon.set_status(message, CHECK_KEYS)
-                bot.send_message(sender_telegram_id, "Проверяем Ваш ключ...")
-                key = dbcon.get_user_vpn_key(sender_telegram_id)
-                user_key = f"Ключ для подключения:\n`{key}`"
-                dbcon.set_status(message, MAIN_MENU)
-                bot.send_message(sender_telegram_id, user_key, parse_mode="MARKDOWN",
-                                 reply_markup=tg_keyboard.main_keyboard())
-                bot.send_message(sender_telegram_id, "Инструкция по подключению - /help")
+                dbcon.set_status(
+                    message,
+                    CHECK_KEYS)
+
+                bot.send_message(
+                    sender_telegram_id,
+                    "Проверяем Ваш ключ...")
+
+                key = dbcon.get_user_vpn_key(
+                    sender_telegram_id)
+
+                user_key = messages.USER_KEY_MESSAGE.format(key)
+
+                dbcon.set_status(
+                    message,
+                    MAIN_MENU)
+
+                bot.send_message(
+                    sender_telegram_id,
+                    user_key,
+                    parse_mode="MARKDOWN",
+                    reply_markup=tg_keyboard.main_keyboard())
+
+                bot.send_message(
+                    sender_telegram_id,
+                    "Инструкция по подключению - /help")
+
+                bot.send_message(
+                    sender_telegram_id,
+                    messages.GET_STATE_KEY,
+                    parse_mode="MARKDOWN",
+                    reply_markup=tg_keyboard.get_state_key())
 
             else:
                 bot.send_message(sender_telegram_id,
@@ -336,7 +408,7 @@ def status(message):
 
         elif message.text == "Логи":
             bot.send_message(sender_telegram_id, "Отправляю логи...")
-            file = logger.get_file_log()
+            file = get_file_log()
             bot.send_document(sender_telegram_id, file)
 
         elif message.text == "Выручка":

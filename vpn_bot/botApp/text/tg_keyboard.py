@@ -1,4 +1,5 @@
 import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def main_keyboard():
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -56,14 +57,10 @@ def yes_or_no_keyboard():
     keyboard.add(button1, button2)
     return keyboard
 
-def make_money():
-    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = telebot.types.KeyboardButton(text="Реферальный код")
-    button2 = telebot.types.KeyboardButton(text="Задания")
-    button3 = telebot.types.KeyboardButton(text="Колесо фортуны")
-    button4 = telebot.types.KeyboardButton(text="Пост в соц.сети")
-    button5 = telebot.types.KeyboardButton(text="Вернуться")
-    keyboard.add(button1, button2)
-    keyboard.add(button3)
-    keyboard.add(button4, button5) 
-    return keyboard
+def get_state_key():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(
+        InlineKeyboardButton("Статичный ключ", callback_data="get_state_key")
+    )
+    return markup

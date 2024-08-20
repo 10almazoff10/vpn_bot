@@ -1,3 +1,4 @@
+pyinstaller
 pytelegrambotapi
 telebot
 psycopg2-binary

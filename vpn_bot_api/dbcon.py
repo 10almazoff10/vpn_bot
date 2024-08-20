@@ -144,3 +144,27 @@ def write_stat(telegram_id, ip, stat_name="default"):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date, ip) values ('{telegram_id}', '{stat_name}', '{date}', '{ip}')")
+
+def get_random_user_key(telegram_id):
+    """
+    Функция получает случайный ключ пользователя из БД
+    Args:
+        telegram_id:
+
+    Returns:
+    key
+    """
+    return execute_query(
+        f"""
+        SELECT 
+            server,
+            server_port,
+            password,
+            method
+        FROM
+            users_vpn_keys
+        WHERE 
+            telegram_id = '{telegram_id}'
+        ORDER BY random() 
+        LIMIT 1;
+        """)
