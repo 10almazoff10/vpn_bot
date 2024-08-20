@@ -147,7 +147,6 @@ def run_backend():
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
 
     check_users_keys()
-    send_give_price()
 
     while True:
         schedule.run_pending()
