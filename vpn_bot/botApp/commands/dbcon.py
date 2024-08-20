@@ -524,7 +524,7 @@ def get_user_state_vpn_key(telegram_id):
             telegram_id = '{telegram_id}'
         ORDER BY random() 
         LIMIT 1;
-        """)[0]
+        """)
 
 def delete_all_users_keys(telegram_id):
     user_keys = []
