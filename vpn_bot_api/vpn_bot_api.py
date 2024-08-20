@@ -11,7 +11,7 @@ import config
 API_PORT = config.API_PORT
 
 #962fd229312b115fe5fb7b6d0b343a58
-SALT = "ProkinVPN"
+SALT = config.SALT
 
 app = Flask(__name__)
 
