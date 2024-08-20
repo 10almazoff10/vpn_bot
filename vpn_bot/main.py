@@ -6,7 +6,7 @@ from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
-from botApp.logs.logger import logger
+from botApp.logs.logger import logger, get_file_log
 from backend import background
 from botApp import config
 
@@ -404,7 +404,7 @@ def status(message):
 
         elif message.text == "Логи":
             bot.send_message(sender_telegram_id, "Отправляю логи...")
-            file = logger.get_file_log()
+            file = get_file_log()
             bot.send_document(sender_telegram_id, file)
 
         elif message.text == "Выручка":
