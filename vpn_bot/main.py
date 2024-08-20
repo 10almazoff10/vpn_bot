@@ -72,7 +72,7 @@ def callback_query(call):
         server = state_key[0]
         server_port = state_key[1]
         method = state_key[2]
-        password = [state_key]
+        password = state_key[3]
 
         bot.send_message(
             call.from_user.id,
