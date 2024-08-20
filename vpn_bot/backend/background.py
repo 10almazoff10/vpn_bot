@@ -146,6 +146,8 @@ def run_backend():
 
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
 
+    delete_all_keys_on_all_servers()
+
     check_users_keys()
 
     while True:
