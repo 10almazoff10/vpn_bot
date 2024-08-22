@@ -81,7 +81,7 @@ def add_new_user(message):
     """
     telegram_id = message.from_user.id
     name = message.from_user.username
-    if len(name) > 20 or len(name) < 1:
+    if len(name) > 20 or name == None :
         name = "Пользователь"
 
     dt = datetime.now()
