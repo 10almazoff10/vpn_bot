@@ -467,8 +467,10 @@ def status(message):
                 bot.send_message(sender_telegram_id, "Сообщение успешно отправлено!",
                                  reply_markup=tg_keyboard.admin_keyboard())
                 try:
-                    bot.send_message(sender_telegram_id, "Пользователь активирован")
+
                     dbcon.unblock_user(telegram_id)
+                    dbcon.get_active_users_without_keys()
+                    bot.send_message(sender_telegram_id, "Пользователь активирован, ключи созданы")
                 except Exception as error:
                     bot.send_message(sender_telegram_id, f"Ошибка при активации пользователя\n{error}")
                 dbcon.set_status(message, ADMIN_MENU)
@@ -551,7 +553,7 @@ def got_payment(message):
                          'Платеж успешно зачислен на ваш счет в размере `{} {}`'.format(
                              message.successful_payment.total_amount / 100, message.successful_payment.currency),
                          parse_mode='Markdown')
-
+        dbcon.calc_balances()
         payer = dbcon.get_user_id(telegram_id)
         bot.send_message(ADMIN_ID,
                          'Успешная оплата пользователя `{}` в размере `{} {}`'.format(

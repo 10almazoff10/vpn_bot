@@ -43,7 +43,12 @@ def remove_all_keys_on_server(API_KEY):
         except Exception as error:
             logger(f"Ошибка удаления ключа {id}\n{error}")
     return count
-def get_stat():
+def get_stat(API_KEY):
+    """
+    Получение статистики по ключам с сервера
+    Returns:
+    Возвращает список параметров
+    """
     return json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)
 
 #list_data = json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)["bytesTransferredByUserId"]
