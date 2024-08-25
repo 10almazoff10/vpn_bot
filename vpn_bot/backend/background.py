@@ -156,7 +156,8 @@ def get_key_traffic():
                         set
                             traffic = '{traffic}' 
                         where 
-                            key_id = {key[0]};""")
+                            key_id = {key[0]} 
+                        AND server = '{key[1]}';""")
             except Exception as error:
                 logger(
                     """Ошибка обновления трафика для ключа {}\n{}""".format(key, error))
