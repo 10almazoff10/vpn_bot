@@ -224,7 +224,8 @@ def get_operations_user(message, count=10):
                                     where user_id = (select id from users where telegram_id = '{message.from_user.id}') 
                                     ORDER BY id DESC LIMIT {count}""", fetch_one=False)
 
-
+def get_list_keys():
+    return execute_query(f"select key_id, telegram_id from users_vpn_keys order by key_id asc;", fetch_one=False)
 def get_user_vpn_key(telegram_id):
     """
     Возвращает динамический ключ пользователя
@@ -271,7 +272,6 @@ def get_users_from_outline():
 
 def get_all_outline_servers():
     links = execute_query("SELECT connection_link FROM outline_servers;", fetch_one=False)
-    print(links)
     return links
 
 def gen_crypted_data(telegram_id:str) -> str:

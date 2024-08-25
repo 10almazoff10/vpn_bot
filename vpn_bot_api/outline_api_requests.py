@@ -34,6 +34,11 @@ def remove_key(id):
     requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
 
 def get_stat():
+    """
+    Получение статистики по ключам с сервера
+    Returns:
+    Возвращает список параметров
+    """
     return json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)
 
 #list_data = json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)["bytesTransferredByUserId"]

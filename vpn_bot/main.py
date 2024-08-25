@@ -553,7 +553,7 @@ def got_payment(message):
                          'Платеж успешно зачислен на ваш счет в размере `{} {}`'.format(
                              message.successful_payment.total_amount / 100, message.successful_payment.currency),
                          parse_mode='Markdown')
-
+        dbcon.calc_balances()
         payer = dbcon.get_user_id(telegram_id)
         bot.send_message(ADMIN_ID,
                          'Успешная оплата пользователя `{}` в размере `{} {}`'.format(

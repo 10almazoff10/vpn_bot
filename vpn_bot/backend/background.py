@@ -120,9 +120,49 @@ def check_users_keys():
             ADMIN_ID,
             "У всех пользователей есть ключи")
 
+def get_key_traffic():
+    """
+    Функция для получения трафика по ключам.
+    - Сначала получает список серверов, затем список ключей.
+    - Создает запрос на сервер, получает данные со всех ключей
+    - парсит полученные данные, вставляет данные по ID ключа
+    Returns:
+        Ничего не возвращает
+    """
+    api_keys = dbcon.get_all_outline_servers()
+
+    for API_KEY in api_keys:
+        try:
+            data = outline_api_reqests.get_stat(API_KEY[0])["bytesTransferredByUserId"]
+        except Exception as error:
+            logger(error)
+
+        key_id = dbcon.get_list_keys()
+        logger("Выполняется загрузка информации о трафике..")
+
+        for key in key_id:
+            try:
+                traffic = convert_size(
+                    int(
+                        data[f"{key[0]}"]
+                    )
+                )
+
+                dbcon.insert_in_db(
+                    f"""update
+                            users_vpn_keys
+                        set
+                            traffic = '{traffic}' 
+                        where 
+                            key_id = {key[0]};""")
+            except Exception as error:
+                logger(
+                    """Ошибка обновления трафика для ключа {}\n{}""".format(key, error))
+        logger("Загрузка выполнена.")
 
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
+schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("10:30").do(send_day_stat)
 #schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
@@ -145,6 +185,8 @@ def run_backend():
         sys.exit(1)
 
     bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
+
+    get_key_traffic()
 
     while True:
         schedule.run_pending()
