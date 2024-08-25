@@ -467,8 +467,10 @@ def status(message):
                 bot.send_message(sender_telegram_id, "Сообщение успешно отправлено!",
                                  reply_markup=tg_keyboard.admin_keyboard())
                 try:
-                    bot.send_message(sender_telegram_id, "Пользователь активирован")
+
                     dbcon.unblock_user(telegram_id)
+                    dbcon.get_active_users_without_keys()
+                    bot.send_message(sender_telegram_id, "Пользователь активирован, ключи созданы")
                 except Exception as error:
                     bot.send_message(sender_telegram_id, f"Ошибка при активации пользователя\n{error}")
                 dbcon.set_status(message, ADMIN_MENU)
