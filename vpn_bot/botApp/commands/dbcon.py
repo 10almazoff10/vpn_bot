@@ -584,7 +584,7 @@ def delete_all_users_keys(telegram_id):
         return False
 
 def get_traffic_by_user(telegram_id):
-    return execute_query(
+    return int(execute_query(
         """
         SELECT 
             sum(traffic)
@@ -592,4 +592,4 @@ def get_traffic_by_user(telegram_id):
             users_vpn_keys
         WHERE
             telegram_id = '{}'
-        """.format(telegram_id))[0]
+        """.format(telegram_id))[0])
