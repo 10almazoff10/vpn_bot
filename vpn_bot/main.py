@@ -284,6 +284,7 @@ def status(message):
 
         elif message.text == "Трафик":
             traffic = dbcon.get_traffic_by_user(sender_telegram_id)
+            logger(traffic)
             traffic = DataConvert.convert_size(traffic)
             bot.send_message(
                 sender_telegram_id,
