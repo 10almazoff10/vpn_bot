@@ -131,6 +131,8 @@ def get_key_traffic():
     """
     api_keys = dbcon.get_all_outline_servers()
 
+    logger("""Получены сервера:\n{}""".format(api_keys))
+
     for API_KEY in api_keys:
         try:
             data = outline_api_reqests.get_stat(API_KEY[0])["bytesTransferredByUserId"]
