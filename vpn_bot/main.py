@@ -2,6 +2,7 @@
 
 import telebot
 import monitoring
+from DataConvert import DataConvert
 from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
@@ -278,7 +279,17 @@ def status(message):
             else:
                 bot.send_message(sender_telegram_id,
                                  messages.LOW_BALANCE_MESSAGE.format(MINIMAL_BALANCE),
-                                 parse_mode="MARKDOWN", reply_markup=tg_keyboard.main_keyboard())
+                                 parse_mode="MARKDOWN",
+                                 reply_markup=tg_keyboard.main_keyboard())
+
+        elif message.text == "Трафик":
+            traffic = dbcon.get_traffic_by_user(sender_telegram_id)
+            traffic = DataConvert.convert_size(traffic)
+            bot.send_message(
+                sender_telegram_id,
+                traffic,
+                parse_mode="MARKDOWN",
+                reply_markup=tg_keyboard.main_keyboard())
 
         else:
             bot.send_message(sender_telegram_id,
