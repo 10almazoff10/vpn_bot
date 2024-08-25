@@ -271,7 +271,15 @@ def get_users_from_outline():
         insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', {id});")
 
 def get_all_outline_servers():
-    links = execute_query("SELECT connection_link, server_ip FROM outline_servers;", fetch_one=False)
+    links = execute_query(
+        """SELECT 
+                    connection_link,
+                    server_ip 
+                FROM 
+                    outline_servers 
+                WHERE standby_status = TRUE;
+            """,
+        fetch_one=False)
     return links
 
 def gen_crypted_data(telegram_id:str) -> str:

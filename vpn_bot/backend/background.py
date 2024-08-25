@@ -144,11 +144,10 @@ def get_key_traffic():
 
         for key in key_id:
             try:
-                traffic = convert_size(
-                    int(
-                        data[f"{key[0]}"]
-                    )
+                traffic = int(
+                    data[f"{key[0]}"]
                 )
+
 
                 dbcon.insert_in_db(
                     f"""update
