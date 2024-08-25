@@ -583,3 +583,13 @@ def delete_all_users_keys(telegram_id):
         logger("Не удается удалить ключи из БД \n" + str(error))
         return False
 
+def get_traffic_by_user(telegram_id):
+    return execute_query(
+        """
+        SELECT 
+            sum(traffic)
+        FROM
+            users_vpn_keys
+        WHERE
+            telegram_id = '{}'
+        """.format(telegram_id))[0]

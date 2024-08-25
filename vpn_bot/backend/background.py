@@ -159,7 +159,7 @@ def get_key_traffic():
                         AND server = '{API_KEY[1]}';""")
             except Exception as error:
                 logger(
-                    """Ошибка обновления трафика для ключа {}\n{}""".format(key, error))
+                    """Ошибка обновления трафика для ключа {}\n{}""".format(key[0], error))
         logger("Загрузка выполнена.")
 
 schedule.every().day.at("10:40").do(one_day_using)
