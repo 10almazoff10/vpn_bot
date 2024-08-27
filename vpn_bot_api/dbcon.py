@@ -140,10 +140,43 @@ def register_user_key(data):  # id, accessUrl, user_password, port, method, tele
 
     insert_in_db("INSERT INTO users_vpn_keys (key_id, telegram_id, accessUrl, user_password, port, method, )")
 
-def write_stat(telegram_id, ip, stat_name="default"):
+def write_stat(telegram_id, ip, stat_name="default", location):
+    country = location["country"]
+    region = location["region"]
+    city = location["city"]
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    insert_in_db(f"insert into users_stat (telegram_id ,stat_name, date, ip) values ('{telegram_id}', '{stat_name}', '{date}', '{ip}')")
+    insert_in_db(
+        """
+            INSERT INTO 
+                users_stat 
+            (
+                telegram_id,
+                stat_name,
+                date, ip,
+                country,
+                region,
+                city
+            ) 
+            VALUES 
+            (
+                '{}',
+                '{}',
+                '{}',
+                '{}',
+                '{}',
+                '{}',
+                '{}')
+            """.format(
+                telegram_id,
+                stat_name,
+                date,
+                ip,
+                country,
+                region,
+                city
+            )
+    )
 
 def get_random_user_key(telegram_id):
     """
