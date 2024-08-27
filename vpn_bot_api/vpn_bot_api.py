@@ -7,6 +7,7 @@ import dbcon
 import outline_api_requests
 from logs.logger import logger
 import config
+from CheckUserLocation import CheckUserLocation
 
 API_PORT = config.API_PORT
 
@@ -53,10 +54,24 @@ def check_user(md5_hash, ip):
             "Подключается пользователь {}".format(
                 telegram_id))
 
-        dbcon.write_stat(
-            telegram_id=telegram_id,
-            ip=ip,
-            stat_name="connect")
+        location = CheckUserLocation(ip).byIP()
+        if location['status'] == 'success':
+
+            dbcon.write_stat(
+                telegram_id=telegram_id,
+                ip=ip,
+                stat_name="connect",
+                location=location)
+
+        else:
+            logger("Ошибка получения информации об IP".format(location))
+            location = {"country":"fail", "region":"fail", "city":"fail"}
+            dbcon.write_stat(
+                telegram_id=telegram_id,
+                ip=ip,
+                stat_name="connect",
+                location=location)
+
 
         user_state = check_user_state(
             telegram_id)
