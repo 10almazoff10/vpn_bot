@@ -140,7 +140,7 @@ def register_user_key(data):  # id, accessUrl, user_password, port, method, tele
 
     insert_in_db("INSERT INTO users_vpn_keys (key_id, telegram_id, accessUrl, user_password, port, method, )")
 
-def write_stat(telegram_id, ip, stat_name="default", location):
+def write_stat(telegram_id, ip, stat_name="default", location=""):
     country = location["country"]
     region = location["region"]
     city = location["city"]
