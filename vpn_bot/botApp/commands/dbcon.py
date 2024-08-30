@@ -514,6 +514,8 @@ def get_active_users_without_keys():
             users_vpn_keys;
         """,
         fetch_one=False)
+    logger(created_users)
+    logger(created_users[0])
     if created_users == []:
         created_users.append('NoData')
 
@@ -521,7 +523,7 @@ def get_active_users_without_keys():
     for telegram_id in list_users:
         logger(f"telegram_id in list_users {telegram_id}")
 
-        if str(telegram_id) not in created_users:
+        if str(telegram_id) not in created_users[0]:
             return_users.append(telegram_id)
             reg_user_keys(telegram_id)
             logger(
