@@ -583,8 +583,8 @@ def got_payment(message):
                              message.successful_payment.total_amount / 100,
                              message.successful_payment.currency),
                          parse_mode='Markdown')
-        dbcon.unblock_user(telegram_id)
-        dbcon.get_active_users_without_keys()
+        if dbcon.unblock_user(telegram_id):
+            dbcon.get_active_users_without_keys()
 
     except Exception as error:
         logger(f"Ошибка при оплате\n{error}")
