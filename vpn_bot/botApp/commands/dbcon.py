@@ -517,7 +517,7 @@ def get_active_users_without_keys():
 
     return_users = []
     for telegram_id in list_users:
-        if telegram_id not in created_users[0]:
+        if telegram_id not in created_users:
             return_users.append(telegram_id)
             reg_user_keys(telegram_id)
             logger(
