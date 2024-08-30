@@ -283,7 +283,15 @@ def status(message):
                                  reply_markup=tg_keyboard.main_keyboard())
 
         elif message.text == "Трафик":
-            traffic = dbcon.get_traffic_by_user(sender_telegram_id)
+            traffic = dbcon.execute_query(
+                """
+                SELECT
+                    traffic
+                FROM
+                    users
+                WHERE
+                    telegram_id = '{}'
+                """.format(sender_telegram_id))[0]
             logger(traffic)
             traffic = DataConvert.convert_size(traffic)
             bot.send_message(
@@ -444,7 +452,8 @@ def status(message):
             user_stats = dbcon.get_users_stats()
             message = "```txt\n"
             for user in user_stats:
-                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + "\n"
+                traffic = DataConvert.convert_size(user[3])
+                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + str(traffic) + "\n"
             message += "\n```"
             bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
             bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")

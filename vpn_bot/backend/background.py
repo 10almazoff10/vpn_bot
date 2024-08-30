@@ -166,7 +166,30 @@ def get_key_traffic():
                             key_id = {key[0]} 
                         AND server = '{API_KEY[1]}'""")
             except Exception as error:
-                logger("Ошибка обновления трафика для ключа {}\n{}".format(key[0], error))
+                logger("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
+
+
+    # Обновление данных по трафику в таблице users
+
+    active_users, disabled_users = dbcon.get_list_users_with_state()
+    for user_data in active_users:
+        telegram_id = user_data[1]
+        traffic = dbcon.get_traffic_by_user(telegram_id)
+
+        dbcon.insert_in_db(
+            """
+            UPDATE
+                users
+            SET
+                traffic = {}
+            WHERE
+                telegram_id = '{}'
+            """.format(
+                traffic,
+                telegram_id)
+        )
+
+
 
         logger("Загрузка выполнена.")
 
