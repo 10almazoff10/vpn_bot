@@ -166,7 +166,7 @@ def get_key_traffic():
                             key_id = {key[0]} 
                         AND server = '{API_KEY[1]}'""")
             except Exception as error:
-                logger("Ошибка обновления трафика для ключа {}\n{}".format(key[0], error))
+                logger("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
 
         logger("Загрузка выполнена.")
 
