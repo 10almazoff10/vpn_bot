@@ -610,7 +610,7 @@ def get_traffic_by_user(telegram_id):
         WHERE
             telegram_id = '{}'
         """.format(telegram_id))[0]
-    logger("Получено - {}, {}".format(count_keys, type(count_keys)))
+    logger("Получено - {} ключ.".format(count_keys))
     if count_keys == None:
         return 0
     elif count_keys == 1:
@@ -635,7 +635,9 @@ def get_traffic_by_user(telegram_id):
                 telegram_id = '{}'
             """.format(telegram_id))[0])
 
-        logger("Более 1 ключа, трафик - {}".format(traffic))
+        logger("У пользователя {} ключа, трафик - {}".format(
+            count_keys,
+            traffic))
         return traffic
 
     else:
