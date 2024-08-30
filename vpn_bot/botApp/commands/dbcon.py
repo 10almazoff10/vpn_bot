@@ -428,7 +428,8 @@ def get_users_stats():
     return execute_query("""select
                                     u.id,
                                     u.name,
-                                    count(us.telegram_id) as user_count
+                                    count(us.telegram_id) as user_count,
+                                    u.traffic
                                 from
                                     users_stat us
                                 left join users u 
@@ -438,7 +439,8 @@ def get_users_stats():
                                     us.date >= (current_date - interval '1 day')
                                 group by
                                     u.id,
-                                    u.name
+                                    u.name,
+                                    u.traffic
                                 order by
                                     user_count desc;
                                 """,
