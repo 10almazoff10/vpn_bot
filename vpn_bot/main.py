@@ -191,7 +191,7 @@ def status(message):
     if user_status == MAIN_MENU:
 
         if message.text == "Баланс":
-            dbcon.calc_balances()
+            #dbcon.calc_balances()
             balance = dbcon.get_user_balance(sender_telegram_id)
             bot.send_message(sender_telegram_id, f"Ваш баланс {balance} руб.",
                              reply_markup=tg_keyboard.main_keyboard())
