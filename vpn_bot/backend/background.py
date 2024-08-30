@@ -153,7 +153,12 @@ def get_key_traffic():
         for key in key_id:
             try:
                 # Получаем значение трафика для ключа
-                traffic = int(data[str(key[0])])
+                try:
+                    traffic = int(data[str(key[0])])
+                except Exception as error:
+                    traffic = 0
+                    logger(error)
+
                 traffic_in_human = DataConvert.convert_size(traffic)
                 logger("Трафик ключа {} составил {}".format(key[0], traffic_in_human))
 
