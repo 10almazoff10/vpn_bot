@@ -622,8 +622,9 @@ def get_traffic_by_user(telegram_id):
             WHERE
                 telegram_id = '{}'
             """.format(telegram_id))[0])
+
     elif int(count_keys) > 1:
-        return int(execute_query(
+        traffic = int(execute_query(
             """
             SELECT 
                 sum(traffic)
@@ -632,5 +633,9 @@ def get_traffic_by_user(telegram_id):
             WHERE
                 telegram_id = '{}'
             """.format(telegram_id))[0])
+
+        logger("Более 1 ключа, трафик - {}".format(traffic))
+        return traffic
+
     else:
         return 0

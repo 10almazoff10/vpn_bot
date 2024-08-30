@@ -1,7 +1,8 @@
 ### 2.0.5 30.08.2024
 - Фикс механизма получения трафика
 ```sql
-alter table public.users add if not exists traffic int;
+alter table public.users add if not exists traffic BIGINT;
+
 ```
 
 ### 2.0.4 27.08.2024
@@ -10,7 +11,7 @@ alter table public.users add if not exists traffic int;
 alter table public.users_stat add if not exists country varchar(30);
 alter table public.users_stat add if not exists region varchar(30);
 alter table public.users_stat add if not exists city varchar(30);
-```
+```+
 ### 2.0.3 25.08.2024
 - Вернул функционал получения трафика по ключам
 ```sql
