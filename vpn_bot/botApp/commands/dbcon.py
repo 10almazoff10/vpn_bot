@@ -611,7 +611,7 @@ def get_traffic_by_user(telegram_id):
         """.format(telegram_id))[0]
     logger("Получено - {}, {}".format(count_keys, type(count_keys)))
     if count_keys == None:
-        return "0"
+        return 0
     elif count_keys == 1:
         return int(execute_query(
             """
