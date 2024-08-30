@@ -454,7 +454,7 @@ def status(message):
             for user in user_stats:
                 logger(user[3])
                 traffic = DataConvert.convert_size(int(user[3]))
-                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + str(traffic) + "\n"
+                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + " " + str(traffic) + "\n"
             message += "\n```"
             bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
             bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")
