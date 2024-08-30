@@ -499,8 +499,8 @@ def get_outline_server_list(only_connection_link=False):
 
 def get_active_users_without_keys():
     active_users, disabled_users = get_list_users_with_state()
-
     list_users = []
+
     for users in active_users:
         list_users.append(users[1])
 
@@ -512,12 +512,13 @@ def get_active_users_without_keys():
             users_vpn_keys;
         """,
         fetch_one=False)
+
     if created_users == []:
         created_users.append('NoData')
 
     return_users = []
     for telegram_id in list_users:
-        if telegram_id not in created_users:
+        if str(telegram_id) not in created_users[0]:
             return_users.append(telegram_id)
             reg_user_keys(telegram_id)
             logger(
@@ -609,7 +610,7 @@ def get_traffic_by_user(telegram_id):
         WHERE
             telegram_id = '{}'
         """.format(telegram_id))[0]
-    logger("Получено - {}, {}".format(count_keys, type(count_keys)))
+    logger("Получено - {} ключ.".format(count_keys))
     if count_keys == None:
         return 0
     elif count_keys == 1:
@@ -634,7 +635,9 @@ def get_traffic_by_user(telegram_id):
                 telegram_id = '{}'
             """.format(telegram_id))[0])
 
-        logger("Более 1 ключа, трафик - {}".format(traffic))
+        logger("У пользователя {} ключа, трафик - {}".format(
+            count_keys,
+            traffic))
         return traffic
 
     else:
