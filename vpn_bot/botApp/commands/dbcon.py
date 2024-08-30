@@ -597,6 +597,7 @@ def delete_all_users_keys(telegram_id):
         return False
 
 def get_traffic_by_user(telegram_id):
+    logger("Получаем трафик для ключа {}".format(telegram_id))
     count_keys = execute_query(
         """
         SELECT
@@ -606,6 +607,7 @@ def get_traffic_by_user(telegram_id):
         WHERE
             telegram_id = '{}'
         """.format(telegram_id))[0]
+    logger("Получено - {}".format(count_keys))
     if count_keys == "":
         return "0"
     elif count_keys == "1":
