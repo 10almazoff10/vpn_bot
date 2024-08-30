@@ -9,6 +9,7 @@ import schedule
 import time
 from botApp.logs.logger import logger
 import sys
+from DataConvert import DataConvert
 
 about_version = dbcon.get_version()
 VERSION = about_version[0]
@@ -129,37 +130,44 @@ def get_key_traffic():
     Returns:
         Ничего не возвращает
     """
-    api_keys = dbcon.get_all_outline_servers()
+    try:
+        server_api_keys = dbcon.get_all_outline_servers()
+    except Exception as error:
+        logger("Ошибка получения данных серверов")
+        return 1
 
-    logger("""Получены сервера:\n{}""".format(api_keys))
+    logger("""Получены сервера:\n{}""".format(server_api_keys))
 
-    for API_KEY in api_keys:
+    for API_KEY in server_api_keys:
+        server_url_token = API_KEY[0]
+        server_ip = API_KEY[1]
         try:
-            data = outline_api_reqests.get_stat(API_KEY[0])["bytesTransferredByUserId"]
+            data = outline_api_reqests.get_stat(server_url_token)["bytesTransferredByUserId"]
         except Exception as error:
             logger(error)
-
-        key_id = dbcon.get_list_keys()
-        logger("Выполняется загрузка информации о трафике..")
+            return 1
+        # Получаем список ключей принадлежащих серверу
+        key_id = dbcon.get_list_keys(server_ip)
+        logger("Выполняется загрузка информации о трафике сервера {}".format(server_ip))
 
         for key in key_id:
             try:
-                traffic = int(
-                    data[f"{key[0]}"]
-                )
-
+                # Получаем значение трафика для ключа
+                traffic = int(data[str(key[0])])
+                traffic_in_human = DataConvert.convert_size(traffic)
+                logger("Трафик ключа {} составил {}".format(key[0], traffic_in_human))
 
                 dbcon.insert_in_db(
-                    f"""update
+                    f"""UPDATE
                             users_vpn_keys
-                        set
+                        SET
                             traffic = '{traffic}' 
-                        where 
+                        WHERE 
                             key_id = {key[0]} 
-                        AND server = '{API_KEY[1]}';""")
+                        AND server = '{API_KEY[1]}'""")
             except Exception as error:
-                logger(
-                    """Ошибка обновления трафика для ключа {}\n{}""".format(key[0], error))
+                logger("Ошибка обновления трафика для ключа {}\n{}".format(key[0], error))
+
         logger("Загрузка выполнена.")
 
 schedule.every().day.at("10:40").do(one_day_using)

@@ -224,8 +224,21 @@ def get_operations_user(message, count=10):
                                     where user_id = (select id from users where telegram_id = '{message.from_user.id}') 
                                     ORDER BY id DESC LIMIT {count}""", fetch_one=False)
 
-def get_list_keys():
-    return execute_query(f"select key_id, telegram_id from users_vpn_keys order by key_id asc;", fetch_one=False)
+def get_list_keys(server_ip):
+    return execute_query(
+        """
+                SELECT 
+                    key_id,
+                    telegram_id
+                FROM 
+                    users_vpn_keys
+                WHERE
+                    server = '{}'
+                ORDER BY
+                    key_id 
+                ASC;""".format(server_ip),
+        fetch_one=False)
+
 def get_user_vpn_key(telegram_id):
     """
     Возвращает динамический ключ пользователя
@@ -584,12 +597,38 @@ def delete_all_users_keys(telegram_id):
         return False
 
 def get_traffic_by_user(telegram_id):
-    return int(execute_query(
+    logger("Получаем трафик для ключа {}".format(telegram_id))
+    count_keys = execute_query(
         """
-        SELECT 
-            sum(traffic)
+        SELECT
+            count(*)
         FROM
             users_vpn_keys
         WHERE
             telegram_id = '{}'
-        """.format(telegram_id))[0])
+        """.format(telegram_id))[0]
+    logger("Получено - {}, {}".format(count_keys, type(count_keys)))
+    if count_keys == "":
+        return "0"
+    elif count_keys == 1:
+        return int(execute_query(
+            """
+            SELECT 
+                traffic
+            FROM
+                users_vpn_keys
+            WHERE
+                telegram_id = '{}'
+            """.format(telegram_id))[0])
+    elif int(count_keys) > 1:
+        return int(execute_query(
+            """
+            SELECT 
+                sum(traffic)
+            FROM
+                users_vpn_keys
+            WHERE
+                telegram_id = '{}'
+            """.format(telegram_id))[0])
+    else:
+        return 0
