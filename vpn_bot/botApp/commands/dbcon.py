@@ -499,10 +499,12 @@ def get_outline_server_list(only_connection_link=False):
 
 def get_active_users_without_keys():
     active_users, disabled_users = get_list_users_with_state()
+    logger(f"active_users {active_users}")
 
     list_users = []
     for users in active_users:
         list_users.append(users[1])
+    logger(f"list_users {list_users}")
 
     created_users = execute_query(
         """
@@ -517,6 +519,7 @@ def get_active_users_without_keys():
 
     return_users = []
     for telegram_id in list_users:
+        logger(f"telegram_id in list_users {telegram_id}")
         if telegram_id not in created_users:
             return_users.append(telegram_id)
             reg_user_keys(telegram_id)
