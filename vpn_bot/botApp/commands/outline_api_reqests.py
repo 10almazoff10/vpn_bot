@@ -28,9 +28,14 @@ def create_new_keys(telegram_id: str, servers_api: list):
 def remove_key(id, API_KEY):
     try:
         logger.info("Удаление ключа {} {}".format(id, API_KEY))
-        requests.delete(f"{API_KEY}/access-keys/{id}", verify=False)
+        result = requests.delete(f"{API_KEY}/access-keys/{id}", verify=False).status_code
+        if result == 204:
+            return True
+        else:
+            return False
     except Exception as error:
         logger.info("Ошибка удаления \n" + str(error))
+        return False
 
 
 def remove_all_keys_on_server(API_KEY):

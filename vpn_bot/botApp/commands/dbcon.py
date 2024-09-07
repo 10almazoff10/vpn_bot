@@ -838,19 +838,18 @@ def delete_key_by_server_id(key_id, server_id):
     """
     API_KEY = get_server_api_key_by_server_id(server_id)
     try:
-        outline.remove_key(
-            key_id,
-            API_KEY)
-
-        execute_query(
-            """
-            DELETE
-            FROM
-                users_vpn_keys
-            WHERE
-                server_id = {} and key_id = {}
-            """.format(server_id, key_id))
-        return True
+        if outline.remove_key(key_id, API_KEY):
+            insert_in_db(
+                """
+                DELETE
+                FROM
+                    users_vpn_keys
+                WHERE
+                    server_id = '{}' and key_id = '{}'
+                """.format(server_id, key_id))
+            return True
+        else:
+            return False
     except Exception as error:
         logger.info(error)
         return False
