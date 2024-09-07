@@ -2,12 +2,13 @@
 
 import telebot
 import monitoring
+import KeyAdmin
 from DataConvert import DataConvert
 from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
 from botApp.text import tg_keyboard, messages
 from botApp.commands import dbcon
-from botApp.logs.logger import logger, get_file_log
+from botApp.logs.logger import Logger, get_file_log
 from backend import background
 from botApp import config
 
@@ -15,6 +16,7 @@ from botApp import config
 backend = Thread(target=background.run_backend)
 backend.start()
 
+logger = Logger(__name__)
 # Loading config
 
 API_TOKEN = config.API_KEY
@@ -106,7 +108,7 @@ def send_welcome(message):
 
     sender_telegram_id = message.from_user.id
 
-    logger(
+    logger.info(
         messages.REGISTER_NEW_USER.format(
             sender_telegram_id))
 
@@ -131,7 +133,7 @@ def send_welcome(message):
             messages.hello_message,
             reply_markup=tg_keyboard.main_keyboard())
 
-        logger(message)
+        logger.info(message)
 
         bot.send_message(
             ADMIN_ID,
@@ -145,15 +147,8 @@ def send_welcome(message):
         # Регистрация пользовательски ключей на доступном в данный момент
         # пуле серверов
 
-        if dbcon.reg_user_keys(sender_telegram_id):
-            logger(
-                messages.REG_KEYS_TRUE.format(
-                    sender_telegram_id))
-        else:
-            bot.send_message(
-                ADMIN_ID,
-                messages.REG_KEYS_FALSE.format(
-                    sender_telegram_id))
+        userKey = KeyAdmin.UserKey(sender_telegram_id)
+        userKey.validate_count_keys()
 
         dbcon.set_status(
             message,
@@ -184,8 +179,8 @@ def send_message(message):
 @bot.message_handler(func=lambda message: True)
 def status(message):
     sender_telegram_id = message.from_user.id
-    logger(message, level="DEBUG")
-    logger(f"Пользователь {sender_telegram_id} написал - {message.text}")
+    logger.info(message, level="DEBUG")
+    logger.info(f"Пользователь {sender_telegram_id} написал - {message.text}")
     user_status = dbcon.get_status(message)
 
     if user_status == MAIN_MENU:
@@ -203,7 +198,7 @@ def status(message):
                              reply_markup=telebot.types.ReplyKeyboardRemove())
 
         elif message.text == "Пополнить":
-            logger(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
+            logger.info(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(message.chat.id,
                              "Переход к форме оплаты...", parse_mode='Markdown')
@@ -292,7 +287,7 @@ def status(message):
                 WHERE
                     telegram_id = '{}'
                 """.format(sender_telegram_id))[0]
-            logger(traffic)
+            logger.info(traffic)
             traffic = DataConvert.convert_size(traffic)
             bot.send_message(
                 sender_telegram_id,
@@ -404,7 +399,7 @@ def status(message):
                     parse_mode="MARKDOWN")
 
             except Exception as error:
-                logger(
+                logger.info(
                     message_with_users,
                     level="DEBUG")
 
@@ -452,12 +447,19 @@ def status(message):
             user_stats = dbcon.get_users_stats()
             message = "```txt\n"
             for user in user_stats:
-                logger(user[3])
+                logger.info(user[3])
                 traffic = DataConvert.convert_size(int(user[3]))
                 message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + " " + str(traffic) + "\n"
             message += "\n```"
             bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
             bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")
+
+        elif message.text == "Актуализация ключей":
+            logger.info("Выполнение актуализации ключей")
+            bot.send_message(sender_telegram_id, "В процессе...")
+            dbcon.get_active_users_without_keys()
+            bot.send_message(sender_telegram_id, "Выполнено")
+
 
 
         else:
@@ -537,7 +539,7 @@ def status(message):
                 counter_done += 1
             except Exception as error:
                 counter_error += 1
-                logger(f"Ошибка отправки сообщения пользователю\n{error}")
+                logger.info(f"Ошибка отправки сообщения пользователю\n{error}")
 
         bot.send_message(sender_telegram_id, f"Успешно отправлено: {counter_done}\nОшибка отправки: {counter_error}",
                          reply_markup=tg_keyboard.admin_keyboard())
@@ -584,10 +586,12 @@ def got_payment(message):
                              message.successful_payment.currency),
                          parse_mode='Markdown')
         if dbcon.unblock_user(telegram_id):
-            dbcon.get_active_users_without_keys()
+            userKey = KeyAdmin.UserKey(telegram_id)
+            userKey.validate_count_keys()
+
 
     except Exception as error:
-        logger(f"Ошибка при оплате\n{error}")
+        logger.info(f"Ошибка при оплате\n{error}")
         bot.send_message(ADMIN_ID, f'Не удалось зачислить платеж пользователя {telegram_id} на сумму {summ}')
         bot.send_message(message.chat.id,
                          'Ошибка платежа, информация передана разработчикам, в ближайшее время деньги будут зачислены в размере `{} {}`'.format(
@@ -602,8 +606,8 @@ def echo_message(message):
     dbcon.set_status(message, 20)
 
 
-logger("Запуск приложения бота")
-logger(monitoring.SystemInfo().to_json())
+logger.info("Запуск приложения бота")
+logger.info(monitoring.SystemInfo().to_json())
 
 if __name__ == "__main__":
     bot.infinity_polling()
