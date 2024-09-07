@@ -701,49 +701,7 @@ def delete_all_users_keys(telegram_id):
         return False
 
 
-def get_traffic_by_user(telegram_id):
-    logger.info("Получаем трафик для ключа {}".format(telegram_id))
-    count_keys = execute_query(
-        """
-        SELECT
-            count(*)
-        FROM
-            users_vpn_keys
-        WHERE
-            telegram_id = '{}'
-        """.format(telegram_id))[0]
-    logger.info("Получено - {} ключ.".format(count_keys))
-    if count_keys == None:
-        return 0
-    elif count_keys == 1:
-        return int(execute_query(
-            """
-            SELECT 
-                traffic
-            FROM
-                users_vpn_keys
-            WHERE
-                telegram_id = '{}'
-            """.format(telegram_id))[0])
 
-    elif int(count_keys) > 1:
-        traffic = int(execute_query(
-            """
-            SELECT 
-                sum(traffic)
-            FROM
-                users_vpn_keys
-            WHERE
-                telegram_id = '{}'
-            """.format(telegram_id))[0])
-
-        logger.info("У пользователя {} ключа, трафик - {}".format(
-            count_keys,
-            traffic))
-        return traffic
-
-    else:
-        return 0
 
 
 def get_all_user_keys(telegram_id):

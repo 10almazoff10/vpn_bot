@@ -81,3 +81,39 @@ class UserKey:
         logger.info("Удаление ключей пользователя {} в количестве {}".format(self.telegram_id, self.keys_count))
         dbcon.delete_all_users_keys(self.telegram_id)
 
+    def get_user_traffic(self):
+        logger.info("Получаем трафик пользователя {}".format(self.telegram_id))
+        logger.info("У пользователя - {} ключей".format(self.keys_count))
+
+        if self.keys_count == None:
+            return 0
+        elif self.keys_count == 1:
+            return int(dbcon.execute_query(
+                """
+                SELECT 
+                    traffic
+                FROM
+                    users_vpn_keys
+                WHERE
+                    telegram_id = '{}'
+                """.format(self.telegram_id))[0])
+
+        elif int(self.keys_count) > 1:
+            traffic = int(dbcon.execute_query(
+                """
+                SELECT 
+                    sum(traffic)
+                FROM
+                    users_vpn_keys
+                WHERE
+                    telegram_id = '{}'
+                """.format(self.telegram_id))[0])
+
+            logger.info("У пользователя {} ключа, трафик - {}".format(
+                self.keys_count,
+                traffic))
+
+            return traffic
+
+        else:
+            return 0
