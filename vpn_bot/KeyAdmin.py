@@ -106,7 +106,7 @@ class UserKey:
                 FROM
                     users_vpn_keys
                 WHERE
-                    telegram_id = '{}'
+                    telegram_id = '{}' 
                 """.format(self.telegram_id))[0])
 
             logger.info("У пользователя {} ключа, трафик - {}".format(

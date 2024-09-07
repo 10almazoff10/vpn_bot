@@ -6,7 +6,7 @@
 - Фикс механизма получения трафика
 ```sql
 alter table public.users add if not exists traffic BIGINT;
-ALTER TABLE users_vpn_keys ALTER COLUMN traffic TYPE bigint
+ALTER TABLE users_vpn_keys ALTER COLUMN traffic TYPE bigint USING traffic::bigint;
 ```
 
 ### 2.0.4 27.08.2024
