@@ -12,7 +12,6 @@ class UserKey:
         self.keys_count: int = len(self.list_user_keys)
 
     def validate_count_keys(self):
-        logger.info(self.user_state)
         if self.user_state == 0:
             if self.servers_count != self.keys_count:
                 logger.info("У пользователя нарушено количество ключей относительно серверов.")
