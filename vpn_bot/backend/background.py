@@ -7,9 +7,10 @@ import telebot
 import math
 import schedule
 import time
-from botApp.logs.logger import logger
+from botApp.logs.logger import Logger
 import sys
 from DataConvert import DataConvert
+import KeyAdmin
 
 about_version = dbcon.get_version()
 VERSION = about_version[0]
@@ -23,6 +24,7 @@ bot = telebot.TeleBot(API_TOKEN)
 ###Admin
 ADMIN_ID = config.ADMIN_ID
 
+logger = Logger(__name__)
 def days_in_mounth():
     current_year = datetime.now().year
     month = datetime.now().month
@@ -51,7 +53,7 @@ def send_give_price():
                 bot.send_message(ADMIN_ID, f"Успешно отправлено")
             except Exception as error:
                 bot.send_message(ADMIN_ID, f"Не удалось отправить...")
-                logger(f"Не удалось отправить...\n{error}")
+                logger.info(f"Не удалось отправить...\n{error}")
 
         elif float(user[1]) <= float(-5):
             telegram_id = user[0]
@@ -76,7 +78,7 @@ def send_give_price():
                         user[3]))
 def update_balance():    
     dbcon.calc_balances()
-    logger("Просчитываем баланс пользователей...")
+    logger.info("Просчитываем баланс пользователей...")
 
 def convert_size(size_bytes):
    if size_bytes == 0:
@@ -94,32 +96,28 @@ def send_day_stat():
 
 #def delete_all_keys_on_all_servers():
 #    list_servers = dbcon.get_outline_server_list()
-#    logger("Запущен процесс удаления старых ключей")
+#    logger.info("Запущен процесс удаления старых ключей")
 #    try:
 #        for server in list_servers:
-#            logger(f"Сервер - {server[0]}")
+#            logger.info(f"Сервер - {server[0]}")
 #            server_api_key = server[5]
 #            print(server_api_key)
 #            count = outline_api_reqests.remove_all_keys_on_server(server_api_key)
-#            logger(f"Удалено {count} ключей")
-#        logger("Очистка успешно выполнена!")
+#            logger.info(f"Удалено {count} ключей")
+#        logger.info("Очистка успешно выполнена!")
 #    except Exception as error:
-#        logger(f"Ошибка удаления:\n{error}")
+#        logger.info(f"Ошибка удаления:\n{error}")
 
 
 def check_users_keys():
-    bot.send_message(ADMIN_ID, "Проверка наличия ключей у пользователей")
-    telegram_id_without_keys = dbcon.get_active_users_without_keys()
-
-    if telegram_id_without_keys != []:
-        bot.send_message(
-            ADMIN_ID,
-            "Зарегистрированы ключи для пользователей - \n".format(
-                telegram_id_without_keys))
-    else:
-        bot.send_message(
-            ADMIN_ID,
-            "У всех пользователей есть ключи")
+    logger.info("Проверяем актуальность ключей")
+    active_users, disabled_users = dbcon.get_list_users_with_state()
+    for user_data in active_users:
+        # Объявляем класс пользователя
+        telegram_id = user_data[1]
+        user = KeyAdmin.UserKey(telegram_id)
+        # Проверяем актуальность ключей
+        user.validate_count_keys()
 
 def get_key_traffic():
     """
@@ -130,25 +128,31 @@ def get_key_traffic():
     Returns:
         Ничего не возвращает
     """
+    logger.info("Получение информации по трафику ключей")
+    servers_api_keys = []
     try:
-        server_api_keys = dbcon.get_all_outline_servers()
+        servers_id = dbcon.get_all_outline_servers()
+        for id in servers_id:
+            api_key = dbcon.get_server_api_key_by_server_id(id)
+            servers_api_keys.append([api_key, id])
+
     except Exception as error:
-        logger("Ошибка получения данных серверов")
+        logger.info("Ошибка получения данных серверов \n{}".format(error))
         return 1
 
-    logger("""Получены сервера:\n{}""".format(server_api_keys))
+    logger.info("""Получены сервера:\n{}""".format(servers_api_keys))
 
-    for API_KEY in server_api_keys:
+    for API_KEY in servers_api_keys:
         server_url_token = API_KEY[0]
         server_ip = API_KEY[1]
         try:
             data = outline_api_reqests.get_stat(server_url_token)["bytesTransferredByUserId"]
         except Exception as error:
-            logger(error)
+            logger.info(error)
             return 1
         # Получаем список ключей принадлежащих серверу
         key_id = dbcon.get_list_keys(server_ip)
-        logger("Выполняется загрузка информации о трафике сервера {}".format(server_ip))
+        logger.info("Выполняется загрузка информации о трафике сервера {}".format(server_ip))
 
         for key in key_id:
             try:
@@ -157,10 +161,10 @@ def get_key_traffic():
                     traffic = int(data[str(key[0])])
                 except Exception as error:
                     traffic = 0
-                    logger(error)
+                    logger.info(error)
 
                 traffic_in_human = DataConvert.convert_size(traffic)
-                logger("Трафик ключа {} составил {}".format(key[0], traffic_in_human))
+                logger.info("Трафик ключа {} составил {}".format(key[0], traffic_in_human))
 
                 dbcon.insert_in_db(
                     f"""UPDATE
@@ -171,7 +175,7 @@ def get_key_traffic():
                             key_id = {key[0]} 
                         AND server = '{API_KEY[1]}'""")
             except Exception as error:
-                logger("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
+                logger.info("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
 
 
     # Обновление данных по трафику в таблице users
@@ -179,7 +183,8 @@ def get_key_traffic():
     active_users, disabled_users = dbcon.get_list_users_with_state()
     for user_data in active_users:
         telegram_id = user_data[1]
-        traffic = dbcon.get_traffic_by_user(telegram_id)
+        userKey = KeyAdmin.UserKey(telegram_id)
+        traffic = userKey.get_user_traffic()
 
         dbcon.insert_in_db(
             """
@@ -194,31 +199,34 @@ def get_key_traffic():
                 telegram_id)
         )
 
+        logger.info("Загрузка выполнена.")
 
 
-        logger("Загрузка выполнена.")
+
 
 schedule.every().day.at("10:40").do(one_day_using)
 schedule.every().hour.at(":00").do(update_balance)
 schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("10:30").do(send_day_stat)
+schedule.every().day.at("03:00").do(check_users_keys)
+
 #schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
 
 def run_backend():
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
-    logger(f"Запуск бекенда, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH} руб.")
+    logger.info(f"Запуск бекенда, установлена сумма оплаты в месяц - {PRICE_PER_MOUNTH} руб.")
     try:
         dbcon.execute_query(
             "select 1",
             fetch_one=True)
 
-        logger("Подключение к БД успешно")
+        logger.info("Подключение к БД успешно")
 
     except Exception as error:
-        logger("Ошибка подключения к БД, выход...")
-        logger(error)
+        logger.info("Ошибка подключения к БД, выход...")
+        logger.info(error)
         bot.send_message(ADMIN_ID, f"Ошибка подключения к БД, {error}")
         sys.exit(1)
 

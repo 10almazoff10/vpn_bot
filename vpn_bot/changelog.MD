@@ -1,8 +1,12 @@
+### 2.1.0 07.09.2024
+- Переработан механизм обслуживания ключей
+- Переработан логгер
+
 ### 2.0.5 30.08.2024
 - Фикс механизма получения трафика
 ```sql
 alter table public.users add if not exists traffic BIGINT;
-
+ALTER TABLE users_vpn_keys ALTER COLUMN traffic TYPE bigint USING traffic::bigint;
 ```
 
 ### 2.0.4 27.08.2024
