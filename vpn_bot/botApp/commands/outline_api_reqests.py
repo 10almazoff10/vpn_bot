@@ -32,6 +32,9 @@ def remove_key(id, API_KEY):
         logger.info(result)
         if result == 204:
             return True
+        elif result == 404:
+            logger.info("Ключа нет на сервере, удаляем из БД")
+            return True
         else:
             return False
     except Exception as error:
