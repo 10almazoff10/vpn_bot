@@ -209,7 +209,7 @@ schedule.every().hour.at(":00").do(update_balance)
 schedule.every().hour.at(":00").do(get_key_traffic)
 schedule.every().day.at("10:30").do(send_give_price)
 schedule.every().day.at("10:30").do(send_day_stat)
-schedule.every(1).minutes.do(check_users_keys)
+schedule.every().day.at("03:00").do(check_users_keys)
 
 #schedule.every().day.at("03:00").do(delete_all_keys_on_all_servers)
 
