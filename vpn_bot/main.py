@@ -456,9 +456,15 @@ def status(message):
 
         elif message.text == "Актуализация ключей":
             logger.info("Выполнение актуализации ключей")
-            bot.send_message(sender_telegram_id, "В процессе...")
-            dbcon.get_active_users_without_keys()
-            bot.send_message(sender_telegram_id, "Выполнено")
+            active_users, disabled_users = dbcon.get_list_users_with_state()
+            for user_data in active_users:
+                # Объявляем класс пользователя
+                telegram_id = user_data[1]
+                user = KeyAdmin.UserKey(telegram_id)
+                # Проверяем актуальность ключей
+                user.validate_count_keys()
+
+            bot.send_message(sender_telegram_id, "Выполнено", parse_mode="MARKDOWN")
 
 
 
