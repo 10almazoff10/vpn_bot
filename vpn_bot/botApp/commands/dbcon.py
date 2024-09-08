@@ -450,10 +450,11 @@ def get_version():
 
 def get_users_stats():
     return execute_query("""select
+                                    ROW_NUMBER() over() as number,
                                     u.id,
                                     u.name,
                                     count(us.telegram_id) as user_count,
-                                    u.traffic
+                                    u.traffic                                    
                                 from
                                     users_stat us
                                 left join users u 
@@ -466,7 +467,7 @@ def get_users_stats():
                                     u.name,
                                     u.traffic
                                 order by
-                                    user_count desc;
+                                    number asc;
                                 """,
                          fetch_one=False)
 

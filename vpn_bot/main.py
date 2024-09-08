@@ -447,18 +447,23 @@ def status(message):
             user_stats = dbcon.get_users_stats()
             message = "```txt\n"
             for user in user_stats:
-                logger.info(user[3])
-                traffic = DataConvert.convert_size(int(user[3]))
-                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + " " + str(traffic) + "\n"
+                traffic = DataConvert.convert_size(int(user[4]))
+                message += str(user[0]) + " " + str(user[1]) + " " + str(user[2]) + " " + str(user[3]) + " " + str(traffic) + "\n"
             message += "\n```"
             bot.send_message(sender_telegram_id, f"За последние сутки обработано {connection_count} коннектов")
             bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")
 
         elif message.text == "Актуализация ключей":
             logger.info("Выполнение актуализации ключей")
-            bot.send_message(sender_telegram_id, "В процессе...")
-            dbcon.get_active_users_without_keys()
-            bot.send_message(sender_telegram_id, "Выполнено")
+            active_users, disabled_users = dbcon.get_list_users_with_state()
+            for user_data in active_users:
+                # Объявляем класс пользователя
+                telegram_id = user_data[1]
+                user = KeyAdmin.UserKey(telegram_id)
+                # Проверяем актуальность ключей
+                user.validate_count_keys()
+
+            bot.send_message(sender_telegram_id, "Выполнено", parse_mode="MARKDOWN")
 
 
 
