@@ -72,7 +72,8 @@ class UserKey:
         servers = dbcon.get_all_outline_servers()
         unregistered = []
         for id_server in servers:
-            if self.list_user_keys != []:
+            print(self.list_user_keys)
+            if self.list_user_keys != [] or self.list_user_keys != None:
                 for id_key in self.list_user_keys:
                     if id_key[1] != id_server and id_key[1] not in unregistered:
                         unregistered.append(id_server)
