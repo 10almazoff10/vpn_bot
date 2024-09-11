@@ -50,6 +50,12 @@ class UserKey:
                                 count += 1
                             logger.info("Удаление выполнено")
 
+            elif self.keys_count == 0:
+                logger.info("У пользователя нет ключей, регистрируем на всех серверах")
+                if dbcon.reg_user_keys(self.telegram_id, self.active_servers):
+                    logger.info("Ключи успешно зарегистрированы")
+                else:
+                    logger.info("Ошибка регистрации ключей")
 
             else:
                 logger.info("Проблем с ключами нет.")
@@ -72,7 +78,7 @@ class UserKey:
         servers = dbcon.get_all_outline_servers()
         unregistered = []
         for id_server in servers:
-            print(self.list_user_keys)
+            logger.info(self.list_user_keys)
             if self.list_user_keys != [] or self.list_user_keys != None:
                 for id_key in self.list_user_keys:
                     if id_key[1] != id_server and id_key[1] not in unregistered:
