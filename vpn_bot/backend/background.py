@@ -163,8 +163,6 @@ def get_key_traffic():
                     traffic = 0
                     logger.info(error)
 
-                traffic_in_human = DataConvert.convert_size(traffic)
-                logger.info("Трафик ключа {} составил {}".format(key[0], traffic_in_human))
 
                 dbcon.insert_in_db(
                     f"""UPDATE

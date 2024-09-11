@@ -43,6 +43,7 @@ class UserKey:
                                     logger.info("Удаляем ключ {} на сервере {}".format(key, server_id))
                                     if dbcon.delete_key_by_server_id(key, server_id):
 
+
                                         logger.info("Ключ успешно удален")
                                     else:
                                         logger.info("Ошибка удаления ключа")
@@ -71,9 +72,13 @@ class UserKey:
         servers = dbcon.get_all_outline_servers()
         unregistered = []
         for id_server in servers:
-            for id_key in self.list_user_keys:
-                if id_key[1] != id_server and id_key[1] not in unregistered:
-                    unregistered.append(id_server)
+            print(self.list_user_keys)
+            if self.list_user_keys != [] or self.list_user_keys != None:
+                for id_key in self.list_user_keys:
+                    if id_key[1] != id_server and id_key[1] not in unregistered:
+                        unregistered.append(id_server)
+            else:
+                unregistered.append(id_server)
         return unregistered
 
     def delete_user_keys(self):
