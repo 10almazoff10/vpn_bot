@@ -16,7 +16,14 @@ class UserKey:
             if self.servers_count != self.keys_count:
                 logger.info("У пользователя нарушено количество ключей относительно серверов.")
 
-                if self.servers_count > self.keys_count:
+                if self.keys_count == 0:
+                    logger.info("У пользователя нет ключей, регистрируем на всех серверах")
+                    if dbcon.reg_user_keys(self.telegram_id, self.active_servers):
+                        logger.info("Ключи успешно зарегистрированы")
+                    else:
+                        logger.info("Ошибка регистрации ключей")
+
+                elif self.servers_count > self.keys_count:
                     logger.info("Серверов больше чем ключей, регистрируем новые ключи для тех серверов, где нет ключей")
                     unregistered_servers = self.get_unregistered_servers()
                     logger.info("У пользователя нет ключа/ей на сервере/ах с id {}, регистрируем".format(unregistered_servers))
@@ -49,13 +56,6 @@ class UserKey:
                                         logger.info("Ошибка удаления ключа")
                                 count += 1
                             logger.info("Удаление выполнено")
-
-            elif self.keys_count == 0:
-                logger.info("У пользователя нет ключей, регистрируем на всех серверах")
-                if dbcon.reg_user_keys(self.telegram_id, self.active_servers):
-                    logger.info("Ключи успешно зарегистрированы")
-                else:
-                    logger.info("Ошибка регистрации ключей")
 
             else:
                 logger.info("Проблем с ключами нет.")
