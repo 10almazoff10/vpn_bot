@@ -158,21 +158,25 @@ def get_key_traffic():
             try:
                 # Получаем значение трафика для ключа
                 try:
-                    key = str(key)
+                    key = str(key[0])
                     traffic = data.get(key)
+                    logger.info("Сервер {}, ключ {}, трафик {}".format(server_id, key, traffic))
                 except Exception as error:
                     traffic = 0
                     logger.info(error)
 
+                if traffic == None:
+                    traffic = 0
 
-                dbcon.insert_in_db(
-                    f"""UPDATE
-                            users_vpn_keys
-                        SET
-                            traffic = '{traffic}' 
-                        WHERE 
-                            key_id = {key[0]} 
-                        AND server_id = '{server_creds[1]}'""")
+                sqlRequest = f"""UPDATE
+                                    users_vpn_keys
+                                SET
+                                    traffic = '{traffic}' 
+                                WHERE 
+                                    key_id = '{key}'
+                                AND server_id = '{server_creds[1]}'"""
+
+                dbcon.insert_in_db(sqlRequest)
             except Exception as error:
                 logger.info("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
 
