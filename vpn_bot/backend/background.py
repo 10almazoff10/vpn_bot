@@ -172,7 +172,7 @@ def get_key_traffic():
                             traffic = '{traffic}' 
                         WHERE 
                             key_id = {key[0]} 
-                        AND server = '{server_creds[1]}'""")
+                        AND server_id = '{server_creds[1]}'""")
             except Exception as error:
                 logger.info("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
 
