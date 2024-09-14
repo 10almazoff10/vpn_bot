@@ -59,7 +59,7 @@ def get_stat(API_KEY):
     """
     Получение статистики по ключам с сервера
     Returns:
-    Возвращает список параметров
+    Возвращает json ответ по всем ключам сервера
     """
     return json.loads(requests.get(f"{API_KEY}/metrics/transfer", verify=False).text)
 

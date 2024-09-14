@@ -146,7 +146,7 @@ def get_key_traffic():
         server_url_token = API_KEY[0]
         server_ip = API_KEY[1]
         try:
-            data = outline_api_reqests.get_stat(server_url_token)["bytesTransferredByUserId"]
+            data: dict = outline_api_reqests.get_stat(server_url_token)["bytesTransferredByUserId"]
         except Exception as error:
             logger.info(error)
             return 1
@@ -158,7 +158,8 @@ def get_key_traffic():
             try:
                 # Получаем значение трафика для ключа
                 try:
-                    traffic = int(data[str(key[0])])
+                    key = str(key)
+                    traffic = data.get(key)
                 except Exception as error:
                     traffic = 0
                     logger.info(error)
