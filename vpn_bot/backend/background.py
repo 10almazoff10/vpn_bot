@@ -176,8 +176,6 @@ def get_key_traffic():
                                     key_id = '{key}'
                                 AND server_id = '{server_creds[1]}'"""
 
-                logger.info(sqlRequest)
-
                 dbcon.insert_in_db(sqlRequest)
             except Exception as error:
                 logger.info("Ошибка обновления трафика для ключа {}, по причине: {}".format(key[0], error))
