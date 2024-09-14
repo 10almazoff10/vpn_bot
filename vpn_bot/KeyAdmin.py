@@ -126,21 +126,24 @@ class UserKey:
                 return 0
 
         elif int(self.keys_count) > 1:
-            traffic = int(dbcon.execute_query(
-                """
-                SELECT 
-                    sum(traffic)
-                FROM
-                    users_vpn_keys
-                WHERE
-                    telegram_id = '{}' 
-                """.format(self.telegram_id))[0])
+            try:
+                traffic = int(dbcon.execute_query(
+                    """
+                    SELECT 
+                        sum(traffic)
+                    FROM
+                        users_vpn_keys
+                    WHERE
+                        telegram_id = '{}' 
+                    """.format(self.telegram_id))[0])
 
-            logger.info("У пользователя {} ключа, трафик - {}".format(
-                self.keys_count,
-                traffic))
-
-            return traffic
+                logger.info("У пользователя {} ключа, трафик - {}".format(
+                    self.keys_count,
+                    traffic))
+                return traffic
+            except Exception as error:
+                logger.info("Ошибка получения трафика для ID {}".format(self.telegram_id))
+                return 0
 
         else:
             return 0
