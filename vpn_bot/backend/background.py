@@ -142,19 +142,19 @@ def get_key_traffic():
 
     logger.info("""Получены сервера:\n{}""".format(servers_api_keys))
 
-    for API_KEY in servers_api_keys:
-        server_url_token = API_KEY[0]
-        server_ip = API_KEY[1]
+    for server_creds in servers_api_keys:
+        server_url_token = server_creds[0]
+        server_id = server_creds[1]
         try:
             data: dict = outline_api_reqests.get_stat(server_url_token)["bytesTransferredByUserId"]
         except Exception as error:
             logger.info(error)
             return 1
         # Получаем список ключей принадлежащих серверу
-        key_id = dbcon.get_list_keys(server_ip)
-        logger.info("Выполняется загрузка информации о трафике сервера {}".format(server_ip))
+        key_ids = dbcon.get_list_keys(server_id)
+        logger.info("Выполняется загрузка информации о трафике сервера {}".format(server_id))
 
-        for key in key_id:
+        for key in key_ids:
             try:
                 # Получаем значение трафика для ключа
                 try:

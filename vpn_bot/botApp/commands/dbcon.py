@@ -234,7 +234,7 @@ def get_operations_user(message, count=10):
                                     ORDER BY id DESC LIMIT {count}""", fetch_one=False)
 
 
-def get_list_keys(server_ip):
+def get_list_keys(server_id):
     return execute_query(
         """
                 SELECT 
@@ -243,10 +243,10 @@ def get_list_keys(server_ip):
                 FROM 
                     users_vpn_keys
                 WHERE
-                    server = '{}'
+                    server_id = '{}'
                 ORDER BY
                     key_id 
-                ASC;""".format(server_ip),
+                ASC;""".format(server_id),
         fetch_one=False)
 
 
