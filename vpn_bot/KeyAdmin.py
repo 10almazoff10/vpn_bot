@@ -3,6 +3,13 @@ from botApp.logs.logger import Logger
 
 logger = Logger(__name__)
 class UserKey:
+    """
+    Methods:
+        validate_count_keys - Актуализирует пользовательские ключи
+        get_unregistered_servers - Возвращает ID серверов, на которых не зарегистрирован ни один ключ пользователя
+        delete_user_keys - удаляет все ключи пользователя
+        get_user_traffic - Получение их БД количества трафика
+    """
     def __init__(self, telegram_id):
         self.telegram_id = telegram_id
         self.user_state = dbcon.get_user_state(telegram_id)
@@ -98,7 +105,8 @@ class UserKey:
         if self.keys_count == None:
             return 0
         elif self.keys_count == 1:
-            return int(dbcon.execute_query(
+            try:
+                size = dbcon.execute_query(
                 """
                 SELECT 
                     traffic
@@ -106,7 +114,16 @@ class UserKey:
                     users_vpn_keys
                 WHERE
                     telegram_id = '{}'
-                """.format(self.telegram_id))[0])
+                """.format(self.telegram_id))[0]
+                if size != None:
+                    return int(size)
+                elif size == None:
+                    return 0
+                else:
+                    return 0
+            except:
+                logger.info("Ошибка получения трафика для ID {}".format(self.telegram_id))
+                return 0
 
         elif int(self.keys_count) > 1:
             traffic = int(dbcon.execute_query(
