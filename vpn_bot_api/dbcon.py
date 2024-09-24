@@ -153,7 +153,8 @@ def write_stat(telegram_id, ip, stat_name="default", location=""):
             (
                 telegram_id,
                 stat_name,
-                date, ip,
+                date,
+                ip,
                 country,
                 region,
                 city
@@ -201,3 +202,17 @@ def get_random_user_key(telegram_id):
         ORDER BY random() 
         LIMIT 1;
         """)
+
+def get_region_from_base(ip):
+    return execute_query(
+        """
+        SELECT
+            country,
+            region,
+            city
+        FROM
+            users_stat
+        WHERE
+            ip = '{}'
+        ORDER BY id DESC;
+        """.format(ip))
