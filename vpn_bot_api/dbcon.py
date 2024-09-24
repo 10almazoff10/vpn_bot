@@ -213,5 +213,6 @@ def get_region_from_base(ip):
         FROM
             users_stat
         WHERE
-            ip = '{}';
+            ip = '{}'
+        ORDER BY id DESC;
         """.format(ip))
