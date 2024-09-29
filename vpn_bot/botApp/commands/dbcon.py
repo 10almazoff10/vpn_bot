@@ -45,7 +45,11 @@ def execute_query(req, fetch_one=True):
     Returns:
         tuple or list: Результат выполнения запроса.
     """
-    with closing(psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)) as conn:
+    with closing(
+        psycopg2.connect(
+            dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
+        )
+    ) as conn:
         with conn.cursor() as cursor:
             cursor.execute(req)
             return cursor.fetchone() if fetch_one else cursor.fetchall()
@@ -62,15 +66,20 @@ def insert_in_db(req):
         None
     """
     try:
-        with closing(psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)) as conn:
+        with closing(
+            psycopg2.connect(
+                dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
+            )
+        ) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(req)
                 conn.commit()
     except Exception as error:
-        print(f'Error inserting data: {error}')
+        print(f"Error inserting data: {error}")
 
 
 ### Работа с пользователями
+
 
 def add_new_user(message):
     """
@@ -97,9 +106,11 @@ def add_new_user(message):
     user_key = gen_crypted_data(message.from_user.id)
 
     insert_in_db(
-        f"INSERT INTO users (telegram_id, name, date_first_enter, status, user_key) VALUES ({telegram_id}, '{name}','{date}', {status}, '{user_key}')")
+        f"INSERT INTO users (telegram_id, name, date_first_enter, status, user_key) VALUES ({telegram_id}, '{name}','{date}', {status}, '{user_key}')"
+    )
     insert_in_db(
-        f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));")
+        f"INSERT INTO operations (summ, type, operation_date, user_id) values (0, 3, '{date}', (SELECT id FROM users WHERE telegram_id = '{telegram_id}'));"
+    )
 
 
 def reg_user_keys(telegram_id, servers_id: list):
@@ -112,8 +123,8 @@ def reg_user_keys(telegram_id, servers_id: list):
         True, False
     """
     server_list = get_outline_server_list_by_id(
-        only_connection_link=True,
-        servers_id=servers_id)
+        only_connection_link=True, servers_id=servers_id
+    )
 
     print(server_list)
 
@@ -152,7 +163,8 @@ def reg_user_keys(telegram_id, servers_id: list):
                     '{key[6]}',
                     '{key[7]}'
                 )
-                """)
+                """
+            )
         return True
 
     except Exception as error:
@@ -169,7 +181,9 @@ def get_user_id(telegram_id):
     Returns:
     id_user
     """
-    return execute_query(f"select id from users where telegram_id = '{telegram_id}';")[0]
+    return execute_query(f"select id from users where telegram_id = '{telegram_id}';")[
+        0
+    ]
 
 
 def get_telegram_id_users():
@@ -178,7 +192,7 @@ def get_telegram_id_users():
     Returns:
 
     """
-    return execute_query('select telegram_id from users;', False)
+    return execute_query("select telegram_id from users;", False)
 
 
 def check_user_indb(telegram_id):
@@ -191,19 +205,27 @@ def check_user_indb(telegram_id):
 
 
 def set_status(message, status):
-    insert_in_db(f"UPDATE users SET status = {status} where telegram_id = '{message.from_user.id}'")
+    insert_in_db(
+        f"UPDATE users SET status = {status} where telegram_id = '{message.from_user.id}'"
+    )
 
 
 def get_status(message):
-    return execute_query(f"SELECT status from users where telegram_id = '{message.from_user.id}'")[0]
+    return execute_query(
+        f"SELECT status from users where telegram_id = '{message.from_user.id}'"
+    )[0]
 
 
 def user_name(message):
-    return execute_query(f"SELECT user_name FROM users WHERE telegram_id = '{message.from_user.id}'")[0]
+    return execute_query(
+        f"SELECT user_name FROM users WHERE telegram_id = '{message.from_user.id}'"
+    )[0]
 
 
 def get_user_balance(telegram_id):
-    return execute_query(f"SELECT balance from users where telegram_id = '{telegram_id}'")[0]
+    return execute_query(
+        f"SELECT balance from users where telegram_id = '{telegram_id}'"
+    )[0]
 
 
 def create_support_task(message):
@@ -211,9 +233,12 @@ def create_support_task(message):
     dt = datetime.now()
     date = dt.strftime("%Y-%m-%d %H:%M:%S")
     insert_in_db(
-        f"INSERT INTO support_tasks (telegram_id, message, date_create) VALUES ('{telegram_id}', '{message.text}', '{date}')")
-    list_tasks = execute_query(f"SELECT id FROM support_tasks WHERE telegram_id = '{telegram_id}' and state = 1",
-                               fetch_one=False)
+        f"INSERT INTO support_tasks (telegram_id, message, date_create) VALUES ('{telegram_id}', '{message.text}', '{date}')"
+    )
+    list_tasks = execute_query(
+        f"SELECT id FROM support_tasks WHERE telegram_id = '{telegram_id}' and state = 1",
+        fetch_one=False,
+    )
     tasks = str()
     for i in list_tasks:
         tasks = tasks + str(i[0]) + ", "
@@ -224,14 +249,18 @@ def calc_balances():
     id_list = execute_query("select id from users", fetch_one=False)
     for id in id_list:
         insert_in_db(
-            f"update users set balance = (select SUM(summ) from operations where user_id = {id[0]}) where id = {id[0]};")
+            f"update users set balance = (select SUM(summ) from operations where user_id = {id[0]}) where id = {id[0]};"
+        )
 
 
 def get_operations_user(message, count=10):
-    return execute_query(f"""select operations.id, operations.summ, operations.operation_date, operation_types.type_name  from operations
+    return execute_query(
+        f"""select operations.id, operations.summ, operations.operation_date, operation_types.type_name  from operations
                                     join operation_types on operation_types.id = operations.type 
                                     where user_id = (select id from users where telegram_id = '{message.from_user.id}') 
-                                    ORDER BY id DESC LIMIT {count}""", fetch_one=False)
+                                    ORDER BY id DESC LIMIT {count}""",
+        fetch_one=False,
+    )
 
 
 def get_list_keys(server_id):
@@ -246,8 +275,11 @@ def get_list_keys(server_id):
                     server_id = '{}'
                 ORDER BY
                     key_id 
-                ASC;""".format(server_id),
-        fetch_one=False)
+                ASC;""".format(
+            server_id
+        ),
+        fetch_one=False,
+    )
 
 
 def get_user_vpn_key(telegram_id):
@@ -261,12 +293,17 @@ def get_user_vpn_key(telegram_id):
 
     """
 
-    user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
+    user_token = execute_query(
+        f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'"""
+    )[0]
     if user_token == "":
         user_key = gen_crypted_data(telegram_id)
         insert_in_db(
-            f"UPDATE users set user_key = '{user_key}' where telegram_id = '{telegram_id}'")
-        user_token = execute_query(f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'""")[0]
+            f"UPDATE users set user_key = '{user_key}' where telegram_id = '{telegram_id}'"
+        )
+        user_token = execute_query(
+            f"""SELECT user_key FROM users WHERE telegram_id  = '{telegram_id}'"""
+        )[0]
 
     user_key = "ssconf://{}/conf/{}".format(API_HOST, user_token)
     return user_key
@@ -285,13 +322,19 @@ def get_users_from_outline():
         date = dt.strftime("%Y-%m-%d %H:%M:%S")
         print(f"{id} {name} {accessUrl} {port} {password}")
         alphabet = string.ascii_letters + string.digits
-        password = ''.join(secrets.choice(alphabet) for i in range(10))
+        password = "".join(secrets.choice(alphabet) for i in range(10))
 
-        insert_in_db(f"insert into users_auth (user_id, user_name, reg_token) values ('{id}','{name}', '{password}')")
-        insert_in_db(f"""insert into users_vpn_keys (user_id, user_password, user_name, access_url, port, date_reg)
-                           values ({id}, '{password}', '{name}', '{accessUrl}', '{port}', '{date}') """)
+        insert_in_db(
+            f"insert into users_auth (user_id, user_name, reg_token) values ('{id}','{name}', '{password}')"
+        )
+        insert_in_db(
+            f"""insert into users_vpn_keys (user_id, user_password, user_name, access_url, port, date_reg)
+                           values ({id}, '{password}', '{name}', '{accessUrl}', '{port}', '{date}') """
+        )
 
-        insert_in_db(f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', {id});")
+        insert_in_db(
+            f"insert into operations (summ, type, operation_date, user_id) values (0, 3, '{date}', {id});"
+        )
 
 
 def get_all_outline_servers():
@@ -307,7 +350,8 @@ def get_all_outline_servers():
                     outline_servers 
                 WHERE standby_status = TRUE;
             """,
-        fetch_one=False)
+        fetch_one=False,
+    )
     ids = []
     for id in list_id:
         ids.append((id[0]))
@@ -322,6 +366,7 @@ def gen_crypted_data(telegram_id: str) -> str:
 
 ########### ADMIN ############
 
+
 def get_list_users_with_state():
     """
     Получение информации о пользователях
@@ -329,7 +374,8 @@ def get_list_users_with_state():
     Возвращает список пользователей и их трафик
     active_users, disabled_users
     """
-    active_users = execute_query("""select
+    active_users = execute_query(
+        """select
                                             name,
                                             telegram_id,
                                             balance,
@@ -342,14 +388,17 @@ def get_list_users_with_state():
                                             user_state = 0
                                         order by
                                             id asc;""",
-                                 fetch_one=False)
+        fetch_one=False,
+    )
 
-    disabled_users = execute_query("""select count(*)
+    disabled_users = execute_query(
+        """select count(*)
                                         from
                                             users
                                         where
                                             user_state = 1""",
-                                   fetch_one=False)[0]
+        fetch_one=False,
+    )[0]
     return active_users, disabled_users[0]
 
 
@@ -376,7 +425,8 @@ def add_money_to_user_from_buffer(message):
             user_id
         from
             operation_buffer))
-        """)
+        """
+    )
 
 
 def add_money_to_user_from_pay_form(telegram_id, summ):
@@ -400,7 +450,8 @@ def add_money_to_user_from_pay_form(telegram_id, summ):
             users
         where
             telegram_id = '{telegram_id}'))
-        """)
+        """
+    )
 
 
 def get_user_telegram_id(id):
@@ -427,7 +478,9 @@ def unblock_user(telegram_id):
     balance = get_user_balance(telegram_id)
     if balance > -5:
         try:
-            insert_in_db(f"update users set user_state = 0 where telegram_id = '{telegram_id}'")
+            insert_in_db(
+                f"update users set user_state = 0 where telegram_id = '{telegram_id}'"
+            )
             return True
         except Exception as error:
             logger.info(error)
@@ -441,15 +494,19 @@ def get_count_connection_last_day():
         """SELECT count(*)
             FROM users_stat
             WHERE date >= (CURRENT_DATE - interval '1 day')
-            AND stat_name ='connect'""")[0]
+            AND stat_name ='connect'"""
+    )[0]
 
 
 def get_version():
-    return execute_query("SELECT version, date FROM bot_version order by id desc limit 1;")
+    return execute_query(
+        "SELECT version, date FROM bot_version order by id desc limit 1;"
+    )
 
 
 def get_users_stats():
-    return execute_query("""select
+    return execute_query(
+        """select
                                     ROW_NUMBER() over() as number,
                                     u.id,
                                     u.name,
@@ -469,7 +526,8 @@ def get_users_stats():
                                 order by
                                     number asc;
                                 """,
-                         fetch_one=False)
+        fetch_one=False,
+    )
 
 
 def get_outline_server_list(only_connection_link=False):
@@ -491,7 +549,8 @@ def get_outline_server_list(only_connection_link=False):
                     outline_servers
                 where standby_status = True;
                 """,
-                fetch_one=False)
+                fetch_one=False,
+            )
             for server in list_servers:
                 logger.info(server)
             return list_servers
@@ -514,7 +573,8 @@ def get_outline_server_list(only_connection_link=False):
                 outline_servers
             where standby_status = True;
             """,
-            fetch_one=False)
+            fetch_one=False,
+        )
         for server in list_servers:
             logger.info(server)
         return list_servers
@@ -524,9 +584,7 @@ def get_outline_server_list(only_connection_link=False):
         sys.exit(1)
 
 
-def get_outline_server_list_by_id(
-        only_connection_link=False,
-        servers_id=False):
+def get_outline_server_list_by_id(only_connection_link=False, servers_id=False):
     """
     Возвращает массив данных по серверам.
     Returns:
@@ -545,7 +603,10 @@ def get_outline_server_list_by_id(
                     from
                         outline_servers
                     where id = '{}';
-                    """.format(id))
+                    """.format(
+                        id
+                    )
+                )
                 links.append(server)
             return links
 
@@ -568,7 +629,8 @@ def get_outline_server_list_by_id(
                 outline_servers
             where standby_status = True;
             """,
-            fetch_one=False)
+            fetch_one=False,
+        )
         for server in list_servers:
             logger.info(server)
         return list_servers
@@ -592,10 +654,11 @@ def get_active_users_without_keys():
         FROM
             users_vpn_keys;
         """,
-        fetch_one=False)
+        fetch_one=False,
+    )
 
     if created_users == []:
-        created_users.append('NoData')
+        created_users.append("NoData")
 
     return_users = []
     for telegram_id in list_users:
@@ -603,8 +666,8 @@ def get_active_users_without_keys():
             return_users.append(telegram_id)
             reg_user_keys(telegram_id)
             logger.info(
-                "Зарегистрированы ключи для пользователя {}".format(
-                    telegram_id))
+                "Зарегистрированы ключи для пользователя {}".format(telegram_id)
+            )
     return return_users
 
 
@@ -624,7 +687,9 @@ def get_user_state(telegram_id):
             users
         WHERE 
             telegram_id = '{telegram_id}'
-        """, fetch_one=True)[0]
+        """,
+        fetch_one=True,
+    )[0]
 
 
 def get_user_state_vpn_key(telegram_id):
@@ -653,7 +718,8 @@ def get_user_state_vpn_key(telegram_id):
             telegram_id = '{telegram_id}'
         ORDER BY random() 
         LIMIT 1;
-        """)
+        """
+    )
 
 
 def delete_all_users_keys(telegram_id):
@@ -670,7 +736,11 @@ def delete_all_users_keys(telegram_id):
                 uvk.server_id = os.id
             where
                 telegram_id = '{}';
-            """.format(telegram_id), fetch_one=False)
+            """.format(
+                telegram_id
+            ),
+            fetch_one=False,
+        )
     except Exception as error:
         logger.info("Не удается получить информацию о ключах из БД\n" + str(error))
         return False
@@ -679,9 +749,7 @@ def delete_all_users_keys(telegram_id):
         for data in user_keys:
             key_id = data[0]
             API_KEY = data[1]
-            outline.remove_key(
-                key_id,
-                API_KEY)
+            outline.remove_key(key_id, API_KEY)
     except Exception as error:
         logger.info("Ошибка удаления ключей с серверов \n" + str(error))
         return False
@@ -694,15 +762,15 @@ def delete_all_users_keys(telegram_id):
                 users_vpn_keys
             where
                 telegram_id = '{}';
-            """.format(telegram_id))
+            """.format(
+                telegram_id
+            )
+        )
         return True
 
     except Exception as error:
         logger.info("Не удается удалить ключи из БД \n" + str(error))
         return False
-
-
-
 
 
 def get_all_user_keys(telegram_id):
@@ -723,8 +791,11 @@ def get_all_user_keys(telegram_id):
             users_vpn_keys
         WHERE
             telegram_id = '{}'
-        """.format(telegram_id),
-        fetch_one=False)
+        """.format(
+            telegram_id
+        ),
+        fetch_one=False,
+    )
 
     return user_keys
 
@@ -741,8 +812,13 @@ def get_count_keys_on_servers_for_user(telegram_id):
             telegram_id = '{}' 
         GROUP BY
             server_id;
-        """.format(telegram_id), fetch_one=False)
+        """.format(
+            telegram_id
+        ),
+        fetch_one=False,
+    )
     return keys_count
+
 
 def get_list_user_keys_by_server_id(telegram_id, server_id):
     """
@@ -763,9 +839,10 @@ def get_list_user_keys_by_server_id(telegram_id, server_id):
         WHERE
             telegram_id = '{}' and server_id = '{}'
         """.format(
-            telegram_id,
-            server_id),
-        fetch_one=False)
+            telegram_id, server_id
+        ),
+        fetch_one=False,
+    )
     result = []
 
     for key in user_keys_on_server:
@@ -773,6 +850,7 @@ def get_list_user_keys_by_server_id(telegram_id, server_id):
     result.sort()
 
     return result
+
 
 def get_server_api_key_by_server_id(server_id):
     API_KEY = execute_query(
@@ -783,8 +861,13 @@ def get_server_api_key_by_server_id(server_id):
             outline_servers
         WHERE
             id = '{}'
-        """.format(server_id))[0]
-    return  API_KEY
+        """.format(
+            server_id
+        )
+    )[0]
+    return API_KEY
+
+
 def delete_key_by_server_id(key_id, server_id):
     """
     Удаляет конкретный ключ на конкретном сервере
@@ -805,10 +888,63 @@ def delete_key_by_server_id(key_id, server_id):
                     users_vpn_keys
                 WHERE
                     server_id = '{}' and key_id = '{}'
-                """.format(server_id, key_id))
+                """.format(
+                    server_id, key_id
+                )
+            )
             return True
         else:
             return False
     except Exception as error:
         logger.info(error)
         return False
+
+def get_list_servers_with_users_state(telegram_id):
+    return execute_query(
+        '''
+        SELECT
+            server,
+            enabled
+        FROM
+            users_vpn_keys
+        WHERE
+            telegram_id = '{}'
+        ORDER BY server DESC
+        '''.format(telegram_id),
+        fetch_one=False
+    )
+
+def user_change_server_state(telegram_id, server_ip):
+    state: bool = execute_query(
+        '''
+        SELECT 
+            enabled
+        FROM
+            users_vpn_keys
+        WHERE
+            telegram_id = '{}' AND server = '{}'
+        '''.format(telegram_id, server_ip)
+    )[0]
+
+    if state == False:
+        insert_in_db(
+        '''
+        UPDATE 
+            users_vpn_keys
+        SET
+            enabled = True
+        WHERE
+            telegram_id = '{}' AND server = '{}'
+        '''.format(telegram_id, server_ip)
+        )
+    elif state == True:
+        insert_in_db(
+        '''
+        UPDATE 
+            users_vpn_keys
+        SET
+            enabled = False
+        WHERE
+            telegram_id = '{}' AND server = '{}'
+        '''.format(telegram_id, server_ip)
+        )
