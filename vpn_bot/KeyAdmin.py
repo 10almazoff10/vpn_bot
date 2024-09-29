@@ -17,6 +17,7 @@ class UserKey:
         self.servers_count: int = len(self.active_servers)
         self.list_user_keys = dbcon.get_all_user_keys(telegram_id)
         self.keys_count: int = len(self.list_user_keys)
+        self.servers_state: list = dbcon.get_list_servers_with_users_state(telegram_id)
 
     def validate_count_keys(self):
         if self.user_state == 0:

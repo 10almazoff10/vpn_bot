@@ -198,7 +198,7 @@ def get_random_user_key(telegram_id):
         FROM
             users_vpn_keys
         WHERE 
-            telegram_id = '{telegram_id}'
+            telegram_id = '{telegram_id}' and enabled = True
         ORDER BY random() 
         LIMIT 1;
         """)

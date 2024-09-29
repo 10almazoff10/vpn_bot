@@ -29,18 +29,6 @@ def admin_keyboard():
     keyboard.add(button3, button8, button_exit)
     return keyboard
 
-def admin_keyboard_keys():
-    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = telebot.types.KeyboardButton(text="Список ключей")
-    button2 = telebot.types.KeyboardButton(text="Трафик по ключу")
-    button3 = telebot.types.KeyboardButton(text="Создать ключ")
-    button4 = telebot.types.KeyboardButton(text="Удалить ключ")
-    button_exit = telebot.types.KeyboardButton(text="Выход")
-    keyboard.add(button1, button2)
-    keyboard.add(button3, button4)
-    keyboard.add(button_exit)
-    return keyboard
-
 def num_keyboard():
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = telebot.types.KeyboardButton(text="5")
@@ -64,4 +52,21 @@ def get_state_key():
     markup.add(
         InlineKeyboardButton("Статичный ключ", callback_data="get_state_key")
     )
+    return markup
+
+
+def manage_servers(servers_list):
+    markup = InlineKeyboardMarkup()
+    for server in servers_list:
+        server_ip = server[0]
+        state = server[1]
+        if state == True:
+            state = '✅'
+        elif state == False:
+            state = '❌'
+        button_text = server_ip + ' ' + state
+
+        markup.add(
+            InlineKeyboardButton(button_text, callback_data="user_change_server_state_{}".format(server_ip))
+        )
     return markup

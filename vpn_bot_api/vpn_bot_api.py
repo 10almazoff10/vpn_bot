@@ -27,8 +27,12 @@ def get_key_for_user(telegram_id):
     logger("Выдаем пользователю случайный ключ")
     try:
         key_data = dbcon.get_random_user_key(telegram_id)
-        logger(f"Ключ получен: {key_data[0]}")
-        return key_data
+        if key_data != None:
+            logger(f"Ключ получен: {key_data[0]}")
+            return key_data
+        else:
+            return False
+
     except Exception as error:
         logger("Ошибка получения ключа из БД\n" + str(error))
 
@@ -80,6 +84,10 @@ def check_user(md5_hash, ip):
             logger("Пользователь не заблокирован, выдаем ключ...")
 
             key_data = get_key_for_user(telegram_id)
+            if key_data == False:
+                logger("Нет доступных ключей")
+                return jsonify({"error":
+                             {"message": "Нет активированных ключей"}})
 
             logger("Ключ отправлен...")
             return jsonify({
