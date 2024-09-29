@@ -9,9 +9,11 @@ def main_keyboard():
     button3 = telebot.types.KeyboardButton(text="Пополнить")
     button4 = telebot.types.KeyboardButton(text="Ключ VPN")
     button5 = telebot.types.KeyboardButton(text="Трафик")
+    button6 = telebot.types.KeyboardButton(text="Управление серверами")
     keyboard.add(button_support, button1)
     keyboard.add(button2, button3)
     keyboard.add(button5, button4)
+    keyboard.add(button6)
     return keyboard
 
 def admin_keyboard():
