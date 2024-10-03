@@ -1,7 +1,10 @@
+### 2.2.1 03.10.2024
+- Добавлено отображение страны в списке серверов
+
 ### 2.2.0 29.09.2024
 - Добавлена возможность пользователям управлять серверами к которым они подключаются
 ```postgres-sql
-alter table public.users_vpn_keys add if not exists enable BOOLEAN default true;
+alter table public.users_vpn_keys add if not exists enabled BOOLEAN default true;
 ```
 
 ## 2.1.2 24.09.2024

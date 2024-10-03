@@ -902,14 +902,17 @@ def delete_key_by_server_id(key_id, server_id):
 def get_list_servers_with_users_state(telegram_id):
     return execute_query(
         '''
-        SELECT
-            server,
-            enabled
-        FROM
-            users_vpn_keys
-        WHERE
+        SELECT  
+            uvk.server server,
+            uvk.enabled enabled,
+            os.country country
+        FROM  
+            users_vpn_keys uvk
+        INNER JOIN outline_servers os
+        ON uvk.server = os.server_ip
+        WHERE  
             telegram_id = '{}'
-        ORDER BY server DESC
+        ORDER BY server DESC;
         '''.format(telegram_id),
         fetch_one=False
     )
