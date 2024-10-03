@@ -62,11 +62,12 @@ def manage_servers(servers_list):
     for server in servers_list:
         server_ip = server[0]
         state = server[1]
+        country = server[2]
         if state == True:
             state = '✅'
         elif state == False:
             state = '❌'
-        button_text = server_ip + ' ' + state
+        button_text = server_ip + ' ' + country + ' ' + state
 
         markup.add(
             InlineKeyboardButton(button_text, callback_data="user_change_server_state_{}".format(server_ip))
