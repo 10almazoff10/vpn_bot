@@ -499,25 +499,25 @@ def get_version():
 def get_users_stats():
     return execute_query(
         """select
-                                    ROW_NUMBER() over() as number,
-                                    u.id,
-                                    u.name,
-                                    count(us.telegram_id) as user_count,
-                                    u.traffic                                    
-                                from
-                                    users_stat us
-                                left join users u 
-                                    on
-                                    u.telegram_id = us.telegram_id
-                                where
-                                    us.date >= (current_date - interval '1 day')
-                                group by
-                                    u.id,
-                                    u.name,
-                                    u.traffic
-                                order by
-                                    number asc;
-                                """,
+                    ROW_NUMBER() over() as number,
+                    u.id,
+                    left(u.name, 5),
+                    count(us.telegram_id) as user_count,
+                    u.traffic                                    
+                from
+                    users_stat us
+                left join users u 
+                    on
+                    u.telegram_id = us.telegram_id
+                where
+                    us.date >= (current_date - interval '1 day')
+                group by
+                    u.id,
+                    u.name,
+                    u.traffic
+                order by
+                    number asc;
+                """,
         fetch_one=False,
     )
 
