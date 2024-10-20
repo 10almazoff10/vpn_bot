@@ -3,6 +3,7 @@
 import telebot
 import monitoring
 import KeyAdmin
+import Statistic
 from DataConvert import DataConvert
 from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
@@ -415,40 +416,14 @@ def status(message):
     elif user_status == ADMIN_MENU:
 
         if message.text == "Пользователи":
-            active_users, disabled_users = dbcon.get_list_users_with_state()
-            active = str()
-            active_count = 0
 
-            for user in active_users:
-                active_count += 1
-                try:
-                    key = user[5]
-                except:
-                    key = ""
-                if key == "" or key == None:
-                    key = "ключа нет"
-                else:
-                    key = f"{key[:7]}.."
-                active = (
-                    active
-                    + f"{user[3]}, {user[0]}, баланс: {user[2]} руб. ключ - {key}\n"
-                )
+            activeUsersTable = Statistic.Users().create_table_active()
 
-            active = active.replace("_", "\\_")
-
-            message_with_users = messages.LIST_USERS.format(
-                active_count, active, disabled_users
+            bot.send_message(
+                sender_telegram_id,
+                f'<pre>{activeUsersTable}</pre>',
+                parse_mode='HTML'
             )
-
-            try:
-                bot.send_message(
-                    sender_telegram_id, message_with_users, parse_mode="MARKDOWN"
-                )
-
-            except Exception as error:
-                logger.info(message_with_users, level="DEBUG")
-
-                bot.send_message(sender_telegram_id, str(error), parse_mode="MARKDOWN")
 
         elif message.text == "Выход из админки":
             dbcon.set_status(message, 20)
@@ -491,32 +466,22 @@ def status(message):
 
         elif message.text == "Статистика":
             connection_count = dbcon.get_count_connection_last_day()
-            user_stats = dbcon.get_users_stats()
-            message = "```txt\n"
-            for user in user_stats:
-                traffic = DataConvert.convert_size(int(user[4]))
-                message += (
-                    str(user[0])
-                    + " "
-                    + str(user[1])
-                    + " "
-                    + str(user[2])
-                    + " "
-                    + str(user[3])
-                    + " "
-                    + str(traffic)
-                    + "\n"
-                )
-            message += "\n```"
+            table_stat = Statistic.Users().create_table_connections()
+
+            bot.send_message(
+                sender_telegram_id,
+                f'<pre>{table_stat}</pre>',
+                parse_mode='HTML'
+            )
+
             bot.send_message(
                 sender_telegram_id,
                 f"За последние сутки обработано {connection_count} коннектов",
             )
-            bot.send_message(sender_telegram_id, message, parse_mode="MARKDOWN")
 
         elif message.text == "Актуализация ключей":
             logger.info("Выполнение актуализации ключей")
-            active_users, disabled_users = dbcon.get_list_users_with_state()
+            active_users = dbcon.get_list_users_with_state()
             for user_data in active_users:
                 # Объявляем класс пользователя
                 telegram_id = user_data[1]

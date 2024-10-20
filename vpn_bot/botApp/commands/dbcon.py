@@ -376,30 +376,22 @@ def get_list_users_with_state():
     """
     active_users = execute_query(
         """select
-                                            name,
-                                            telegram_id,
-                                            balance,
-                                            id,
-                                            user_state,
-                                            user_key
-                                        from
-                                            users
-                                        where
-                                            user_state = 0
-                                        order by
-                                            id asc;""",
+                    name,
+                    telegram_id,
+                    balance,
+                    id,
+                    user_state,
+                    user_key
+                from
+                    users
+                where
+                    user_state = 0
+                order by
+                    id asc;""",
         fetch_one=False,
     )
 
-    disabled_users = execute_query(
-        """select count(*)
-                                        from
-                                            users
-                                        where
-                                            user_state = 1""",
-        fetch_one=False,
-    )[0]
-    return active_users, disabled_users[0]
+    return active_users
 
 
 def add_money_to_user_from_buffer(message):

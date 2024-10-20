@@ -111,7 +111,7 @@ def send_day_stat():
 
 def check_users_keys():
     logger.info("Проверяем актуальность ключей")
-    active_users, disabled_users = dbcon.get_list_users_with_state()
+    active_users = dbcon.get_list_users_with_state()
     for user_data in active_users:
         # Объявляем класс пользователя
         telegram_id = user_data[1]
@@ -183,7 +183,7 @@ def get_key_traffic():
 
     # Обновление данных по трафику в таблице users
 
-    active_users, disabled_users = dbcon.get_list_users_with_state()
+    active_users = dbcon.get_list_users_with_state()
     for user_data in active_users:
         telegram_id = user_data[1]
         userKey = KeyAdmin.UserKey(telegram_id)
