@@ -6,3 +6,4 @@ schedule
 pyyaml
 flask
 psutil
+prettytable

@@ -376,30 +376,22 @@ def get_list_users_with_state():
     """
     active_users = execute_query(
         """select
-                                            name,
-                                            telegram_id,
-                                            balance,
-                                            id,
-                                            user_state,
-                                            user_key
-                                        from
-                                            users
-                                        where
-                                            user_state = 0
-                                        order by
-                                            id asc;""",
+                    name,
+                    telegram_id,
+                    balance,
+                    id,
+                    user_state,
+                    user_key
+                from
+                    users
+                where
+                    user_state = 0
+                order by
+                    id asc;""",
         fetch_one=False,
     )
 
-    disabled_users = execute_query(
-        """select count(*)
-                                        from
-                                            users
-                                        where
-                                            user_state = 1""",
-        fetch_one=False,
-    )[0]
-    return active_users, disabled_users[0]
+    return active_users
 
 
 def add_money_to_user_from_buffer(message):
@@ -507,25 +499,25 @@ def get_version():
 def get_users_stats():
     return execute_query(
         """select
-                                    ROW_NUMBER() over() as number,
-                                    u.id,
-                                    u.name,
-                                    count(us.telegram_id) as user_count,
-                                    u.traffic                                    
-                                from
-                                    users_stat us
-                                left join users u 
-                                    on
-                                    u.telegram_id = us.telegram_id
-                                where
-                                    us.date >= (current_date - interval '1 day')
-                                group by
-                                    u.id,
-                                    u.name,
-                                    u.traffic
-                                order by
-                                    number asc;
-                                """,
+                    ROW_NUMBER() over() as number,
+                    u.id,
+                    left(u.name, 5),
+                    count(us.telegram_id) as user_count,
+                    u.traffic                                    
+                from
+                    users_stat us
+                left join users u 
+                    on
+                    u.telegram_id = us.telegram_id
+                where
+                    us.date >= (current_date - interval '1 day')
+                group by
+                    u.id,
+                    u.name,
+                    u.traffic
+                order by
+                    number asc;
+                """,
         fetch_one=False,
     )
 
