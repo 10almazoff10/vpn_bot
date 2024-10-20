@@ -376,7 +376,7 @@ def get_list_users_with_state():
     """
     active_users = execute_query(
         """select
-                    name,
+                    left(name, 7),
                     telegram_id,
                     balance,
                     id,
