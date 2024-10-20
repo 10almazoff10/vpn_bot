@@ -1,6 +1,6 @@
 from prettytable import PrettyTable
 import botApp.commands.dbcon as dbcon
-
+import DataConvert
 
 class Users:
     def __init__(self):
@@ -28,6 +28,6 @@ class Users:
         # добавление данных по одной строке за раз
 
         for user in user_stats:
-            tableUsers.add_row([user[0], user[1], user[2], user[3], user[4]])
+            tableUsers.add_row([user[0], user[1], user[2], user[3], DataConvert.DataConvert.convert_size(user[4])])
 
         return tableUsers
