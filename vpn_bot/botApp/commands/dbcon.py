@@ -879,6 +879,7 @@ def delete_key_by_server_id(key_id, server_id):
             logger.info("Ошибка удаления ключа с сервера - {}".format(error))
 
         try:
+
             insert_in_db(
                     """
                     DELETE

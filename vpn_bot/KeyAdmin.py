@@ -73,16 +73,12 @@ class UserKey:
                         elif server_state == False:
                             logger.info("Сервер отключен, удаляем ключи...")
                             keys = dbcon.get_list_user_keys_by_server_id(self.telegram_id, server_id)
-                            logger.info("Получено {}".format(len(keys)))
-                            count = 0
                             for key in keys:
-                                if count != 0:
-                                    logger.info("Удаляем ключ {} на сервере {}".format(key, server_id))
-                                    if dbcon.delete_key_by_server_id(key, server_id):
-                                        logger.info("Ключ успешно удален")
-                                    else:
-                                        logger.info("Ошибка удаления ключа")
-                                count += 1
+                                logger.info("Удаляем ключ {} на сервере {}".format(key, server_id))
+                                if dbcon.delete_key_by_server_id(key, server_id):
+                                    logger.info("Ключ успешно удален")
+                                else:
+                                    logger.info("Ошибка удаления ключа")
                             logger.info("Удаление выполнено")
 
             else:
