@@ -872,20 +872,28 @@ def delete_key_by_server_id(key_id, server_id):
     """
     API_KEY = get_server_api_key_by_server_id(server_id)
     try:
-        if outline.remove_key(key_id, API_KEY):
+        try:
+            logger.info("Удаление ключа с сервера - {}".format(server_id))
+            outline.remove_key(key_id, API_KEY)
+        except Exception as error:
+            logger.info("Ошибка удаления ключа с сервера - {}".format(error))
+
+        try:
             insert_in_db(
-                """
-                DELETE
-                FROM
-                    users_vpn_keys
-                WHERE
-                    server_id = '{}' and key_id = '{}'
-                """.format(
-                    server_id, key_id
+                    """
+                    DELETE
+                    FROM
+                        users_vpn_keys
+                    WHERE
+                        server_id = '{}' and key_id = '{}'
+                    """.format(
+                        server_id,
+                        key_id
+                    )
                 )
-            )
             return True
-        else:
+        except Exception as error:
+            logger.info("Ошибка удаления ключа из БД".format(error))
             return False
     except Exception as error:
         logger.info(error)
@@ -943,3 +951,19 @@ def user_change_server_state(telegram_id, server_ip):
             telegram_id = '{}' AND server = '{}'
         '''.format(telegram_id, server_ip)
         )
+
+def get_server_state(server_id):
+    """
+    Возвращает статус сервера
+    True | False
+    """
+    return execute_query(
+    '''
+    SELECT
+        standby_status
+    FROM
+        outline_servers
+    WHERE
+        id = '{}'
+    '''.format(server_id)
+    , fetch_one=True)[0]
