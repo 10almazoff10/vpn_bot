@@ -10,6 +10,7 @@ import config
 from CheckUserLocation import CheckUserLocation
 
 API_PORT = config.API_PORT
+API_HOST = config.API_HOST
 
 SALT = config.SALT
 
@@ -117,7 +118,7 @@ def handle_conf(md5_hash):
 
 
 def run_api():
-    app.run(host="127.0.0.1", port=API_PORT, debug=False)
+    app.run(host=API_HOST, port=API_PORT, debug=False)
 
 if __name__ == "__main__":
     run_api()
