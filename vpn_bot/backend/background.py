@@ -12,9 +12,7 @@ import sys
 from DataConvert import DataConvert
 import KeyAdmin
 
-about_version = dbcon.get_version()
-VERSION = about_version[0]
-BUILD_DATE = about_version[1]
+VERSION = '2.2.3'
 
 PRICE_PER_MOUNTH = 75
 
@@ -233,8 +231,7 @@ def run_backend():
         bot.send_message(ADMIN_ID, f"Ошибка подключения к БД, {error}")
         sys.exit(1)
 
-    bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\nДата выхода - {BUILD_DATE}")
-
+    bot.send_message(ADMIN_ID, f"Сервер запущен - {date}\nВерсия - {VERSION}\n")
     get_key_traffic()
 
     while True:

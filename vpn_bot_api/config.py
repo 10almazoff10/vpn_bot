@@ -14,6 +14,7 @@ DB_PORT = database["port"]
 #Параметры API
 api = cfg_file["api"]
 API_PORT = api["port"]
+API_HOST = api["host"]
 
 #Параметры соли
 app = cfg_file["app"]
