@@ -14,6 +14,10 @@ class Logger:
             className: __name__
         """
         self.className = className
+        validate_path(LOGS_DIR)
+
+
+
 
     def info(self, logs, level="MAIN"):
         dt = datetime.now()
@@ -32,6 +36,8 @@ class Logger:
                 print(error)
 
         elif level == "DEBUG":
+            DEBUG_PATH=f"{LOGS_DIR}/debug"
+            validate_path(DEBUG_PATH)
 
             logFile = f"{LOGS_DIR}/debug/debug-{date}.txt"
             try:
@@ -43,6 +49,9 @@ class Logger:
             except Exception as error:
                 print(error)
 
+def validate_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def logger(logs, level="MAIN"):
     dt = datetime.now()
@@ -79,4 +88,3 @@ def get_file_log():
     logFile = f"{LOGS_DIR}/telebot-{date}.txt"
     return open(logFile, "rb")
 
-    

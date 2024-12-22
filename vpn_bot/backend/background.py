@@ -12,7 +12,7 @@ import sys
 from DataConvert import DataConvert
 import KeyAdmin
 
-VERSION = '2.2.3'
+VERSION = '2.2.4'
 
 PRICE_PER_MOUNTH = 75
 

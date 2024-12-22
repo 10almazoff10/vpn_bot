@@ -941,6 +941,7 @@ def user_change_server_state(telegram_id, server_ip):
             telegram_id = '{}' AND server = '{}'
         '''.format(telegram_id, server_ip)
         )
+        logger.info("Пользователь {} включил сервер {}".format(telegram_id, server_ip))
     elif state == True:
         insert_in_db(
         '''
@@ -952,6 +953,7 @@ def user_change_server_state(telegram_id, server_ip):
             telegram_id = '{}' AND server = '{}'
         '''.format(telegram_id, server_ip)
         )
+        logger.info("Пользователь {} отключил сервер {}".format(telegram_id, server_ip))
 
 def get_server_state(server_id):
     """
