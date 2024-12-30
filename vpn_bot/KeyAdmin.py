@@ -1,5 +1,5 @@
-import botApp.commands.dbcon as dbcon
-from botApp.logs.logger import Logger
+import vpn_bot.commands.dbcon as dbcon
+from vpn_bot.utils.logger import Logger
 
 logger = Logger(__name__)
 class UserKey:

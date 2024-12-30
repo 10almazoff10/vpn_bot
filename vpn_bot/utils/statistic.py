@@ -1,6 +1,6 @@
 from prettytable import PrettyTable
-import botApp.commands.dbcon as dbcon
-import DataConvert
+import vpn_bot.commands.dbcon as dbcon
+from vpn_bot.utils.data_converter import DataConvert
 
 class Users:
     def __init__(self):

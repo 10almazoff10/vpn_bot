@@ -5,11 +5,11 @@ from contextlib import closing
 from datetime import datetime
 from calendar import monthrange
 import secrets
-from botApp.commands import outline_api_reqests as outline
+from vpn_bot.commands import outline_api_reqests as outline
 import string
-from botApp import config
-from botApp.logs.logger import Logger
-from botApp.crypt.MD5 import MD5
+from vpn_bot import config
+from vpn_bot.utils.logger import Logger
+from vpn_bot.utils.hash_decoder import MD5
 
 DB_NAME = config.DB_NAME
 DB_USER = config.DB_USER
@@ -46,9 +46,9 @@ def execute_query(req, fetch_one=True):
         tuple or list: Результат выполнения запроса.
     """
     with closing(
-        psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
-        )
+            psycopg2.connect(
+                dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
+            )
     ) as conn:
         with conn.cursor() as cursor:
             cursor.execute(req)
@@ -67,9 +67,9 @@ def insert_in_db(req):
     """
     try:
         with closing(
-            psycopg2.connect(
-                dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
-            )
+                psycopg2.connect(
+                    dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
+                )
         ) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(req)
@@ -699,18 +699,22 @@ def get_user_state_vpn_key(telegram_id):
     """
     return execute_query(
         f"""
-        SELECT 
-            server,
-            server_port,
-            method,
-            password 
-        FROM
-            users_vpn_keys
-        WHERE 
-            telegram_id = '{telegram_id}'
-        ORDER BY random() 
-        LIMIT 1;
-        """
+            select
+                uvk.server server,
+                uvk.server_port,
+                uvk.method,
+                uvk."password" ,
+                os.country country
+            from
+                users_vpn_keys uvk
+            inner join outline_servers os
+                    on
+                uvk.server = os.server_ip
+            where
+                telegram_id = '{telegram_id}'
+            order by
+                server desc;
+        """, fetch_one=False
     )
 
 
@@ -881,17 +885,17 @@ def delete_key_by_server_id(key_id, server_id):
         try:
 
             insert_in_db(
-                    """
-                    DELETE
-                    FROM
-                        users_vpn_keys
-                    WHERE
-                        server_id = '{}' and key_id = '{}'
-                    """.format(
-                        server_id,
-                        key_id
-                    )
+                """
+                DELETE
+                FROM
+                    users_vpn_keys
+                WHERE
+                    server_id = '{}' and key_id = '{}'
+                """.format(
+                    server_id,
+                    key_id
                 )
+            )
             return True
         except Exception as error:
             logger.info("Ошибка удаления ключа из БД".format(error))
@@ -899,6 +903,7 @@ def delete_key_by_server_id(key_id, server_id):
     except Exception as error:
         logger.info(error)
         return False
+
 
 def get_list_servers_with_users_state(telegram_id):
     return execute_query(
@@ -918,6 +923,7 @@ def get_list_servers_with_users_state(telegram_id):
         fetch_one=False
     )
 
+
 def user_change_server_state(telegram_id, server_ip):
     state: bool = execute_query(
         '''
@@ -932,26 +938,27 @@ def user_change_server_state(telegram_id, server_ip):
 
     if state == False:
         insert_in_db(
-        '''
-        UPDATE 
-            users_vpn_keys
-        SET
-            enabled = True
-        WHERE
-            telegram_id = '{}' AND server = '{}'
-        '''.format(telegram_id, server_ip)
+            '''
+            UPDATE 
+                users_vpn_keys
+            SET
+                enabled = True
+            WHERE
+                telegram_id = '{}' AND server = '{}'
+            '''.format(telegram_id, server_ip)
         )
     elif state == True:
         insert_in_db(
-        '''
-        UPDATE 
-            users_vpn_keys
-        SET
-            enabled = False
-        WHERE
-            telegram_id = '{}' AND server = '{}'
-        '''.format(telegram_id, server_ip)
+            '''
+            UPDATE 
+                users_vpn_keys
+            SET
+                enabled = False
+            WHERE
+                telegram_id = '{}' AND server = '{}'
+            '''.format(telegram_id, server_ip)
         )
+
 
 def get_server_state(server_id):
     """
@@ -959,12 +966,12 @@ def get_server_state(server_id):
     True | False
     """
     return execute_query(
-    '''
-    SELECT
-        standby_status
-    FROM
-        outline_servers
-    WHERE
-        id = '{}'
-    '''.format(server_id)
-    , fetch_one=True)[0]
+        '''
+        SELECT
+            standby_status
+        FROM
+            outline_servers
+        WHERE
+            id = '{}'
+        '''.format(server_id)
+        , fetch_one=True)[0]

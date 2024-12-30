@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from botApp import config
+from vpn_bot import config
 import bz2
 import os
 

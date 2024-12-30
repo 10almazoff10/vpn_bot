@@ -3,6 +3,7 @@ import yaml
 with open('./config.yaml', 'r') as file:
     cfg_file = yaml.safe_load(file)
 
+PRICE_PER_MOUNTH = cfg_file["price"]
 
 API_KEY = cfg_file["telegram"]["api"]
 ADMIN_ID = cfg_file["telegram"]["admin_id"]

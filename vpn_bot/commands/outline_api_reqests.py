@@ -1,8 +1,7 @@
-from botApp import config
 import requests
 import json
-from botApp.logs.logger import Logger
-from datetime import datetime
+from vpn_bot.utils.logger import Logger
+from vpn_bot.config import API_KEY
 
 logger = Logger(__name__)
 def get_all_api_keys():

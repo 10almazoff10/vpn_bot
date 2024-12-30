@@ -1,17 +1,17 @@
 #!/usr/bin/python
 
 import telebot
-import monitoring
-import KeyAdmin
-import Statistic
-from DataConvert import DataConvert
+from vpn_bot.utils import monitoring, statistic
+from vpn_bot.utils.data_converter import DataConvert
+from vpn_bot import KeyAdmin
 from telebot.types import LabeledPrice, ShippingOption
 from threading import Thread
-from botApp.text import tg_keyboard, messages
-from botApp.commands import dbcon
-from botApp.logs.logger import Logger, get_file_log
-from backend import background
-from botApp import config
+from vpn_bot.text import tg_keyboard, messages
+from vpn_bot.commands import dbcon
+from vpn_bot.utils.logger import Logger, get_file_log
+from vpn_bot.background import background
+from vpn_bot import config
+from vpn_bot.text import buttons
 
 # Run Backend
 backend = Thread(target=background.run_backend)
@@ -75,18 +75,25 @@ def callback_query(call):
     if call.data == "get_state_key":
         bot.answer_callback_query(call.id, "Получаем ключ...")
 
-        state_key = dbcon.get_user_state_vpn_key(call.from_user.id)
+        state_keys = dbcon.get_user_state_vpn_key(call.from_user.id)
+        for state_key in state_keys:
+            server = state_key[0]
+            server_port = state_key[1]
+            method = state_key[2]
+            password = state_key[3]
+            server_country = state_key[4]
 
-        server = state_key[0]
-        server_port = state_key[1]
-        method = state_key[2]
-        password = state_key[3]
-
-        bot.send_message(
-            call.from_user.id,
-            messages.SEND_STATE_KEY.format(server, server_port, method, password),
-            parse_mode="MARKDOWN",
-        )
+            bot.send_message(
+                call.from_user.id,
+                messages.SEND_STATE_KEY.format(
+                    server_country,
+                    server,
+                    server_port,
+                    method,
+                    password
+                ),
+                parse_mode="MARKDOWN",
+            )
 
     elif call.data == "cb_no":
 
@@ -108,15 +115,11 @@ def callback_query(call):
             reply_markup=tg_keyboard.manage_servers(servers_list))
 
 
-
 @bot.message_handler(commands=["start"])
-
 # Ответ пользователю на команду START
 # Так же выполняется проверка, существует ли пользователь
 
-
 def send_welcome(message):
-
     # Создание переменной со значением TelegramID
 
     sender_telegram_id = message.from_user.id
@@ -194,7 +197,7 @@ def status(message):
 
     if user_status == MAIN_MENU:
 
-        if message.text == "Баланс":
+        if message.text == buttons.balance:
             # dbcon.calc_balances()
             balance = dbcon.get_user_balance(sender_telegram_id)
             bot.send_message(
@@ -203,7 +206,7 @@ def status(message):
                 reply_markup=tg_keyboard.main_keyboard(),
             )
 
-        elif message.text == "Написать в поддержку":
+        elif message.text == buttons.support:
             dbcon.set_status(message, CREATE_MESSAGE_TO_SUPPORT)
             bot.send_message(
                 sender_telegram_id,
@@ -211,7 +214,7 @@ def status(message):
                 reply_markup=telebot.types.ReplyKeyboardRemove(),
             )
 
-        elif message.text == "Пополнить":
+        elif message.text == buttons.payments:
             logger.info(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(
@@ -248,7 +251,7 @@ def status(message):
                 prices_3,
             )
 
-        elif message.text == "Последние операции":
+        elif message.text == buttons.operations:
             dbcon.set_status(message, GET_OPERATIONS_REQUEST)
             bot.send_message(
                 sender_telegram_id,
@@ -256,7 +259,7 @@ def status(message):
                 reply_markup=tg_keyboard.num_keyboard(),
             )
 
-        elif message.text == "Ключ VPN":
+        elif message.text == buttons.key:
 
             if dbcon.get_user_balance(sender_telegram_id) > MINIMAL_BALANCE:
 
@@ -296,7 +299,7 @@ def status(message):
                     reply_markup=tg_keyboard.main_keyboard(),
                 )
 
-        elif message.text == "Трафик":
+        elif message.text == buttons.traffic:
             traffic = dbcon.execute_query(
                 """
                 SELECT
@@ -317,7 +320,7 @@ def status(message):
                 parse_mode="MARKDOWN",
                 reply_markup=tg_keyboard.main_keyboard(),
             )
-        elif message.text == "Управление серверами":
+        elif message.text == buttons.servers:
             user = KeyAdmin.UserKey(sender_telegram_id)
             servers_list = user.servers_state
 
@@ -417,7 +420,7 @@ def status(message):
 
         if message.text == "Пользователи":
 
-            activeUsersTable = Statistic.Users().create_table_active()
+            activeUsersTable = statistic.Users().create_table_active()
 
             bot.send_message(
                 sender_telegram_id,
@@ -466,7 +469,7 @@ def status(message):
 
         elif message.text == "Статистика":
             connection_count = dbcon.get_count_connection_last_day()
-            table_stat = Statistic.Users().create_table_connections()
+            table_stat = statistic.Users().create_table_connections()
 
             bot.send_message(
                 sender_telegram_id,
@@ -640,7 +643,7 @@ def checkout(pre_checkout_query):
         pre_checkout_query.id,
         ok=True,
         error_message="Aliens tried to steal your card's CVV, but we successfully protected your credentials,"
-        " try to pay again in a few minutes, we need a small rest.",
+                      " try to pay again in a few minutes, we need a small rest.",
     )
 
 

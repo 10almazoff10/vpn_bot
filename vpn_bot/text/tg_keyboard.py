@@ -1,15 +1,16 @@
 import telebot
+from vpn_bot.text import buttons
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def main_keyboard():
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button_support = telebot.types.KeyboardButton(text="Написать в поддержку")
-    button1 = telebot.types.KeyboardButton(text="Баланс")
-    button2 = telebot.types.KeyboardButton(text="Последние операции")
-    button3 = telebot.types.KeyboardButton(text="Пополнить")
-    button4 = telebot.types.KeyboardButton(text="Ключ VPN")
-    button5 = telebot.types.KeyboardButton(text="Трафик")
-    button6 = telebot.types.KeyboardButton(text="Управление серверами")
+    button_support = telebot.types.KeyboardButton(text=buttons.support)
+    button1 = telebot.types.KeyboardButton(text=buttons.balance)
+    button2 = telebot.types.KeyboardButton(text=buttons.payments)
+    button3 = telebot.types.KeyboardButton(text=buttons.operations)
+    button4 = telebot.types.KeyboardButton(text=buttons.key)
+    button5 = telebot.types.KeyboardButton(text=buttons.traffic)
+    button6 = telebot.types.KeyboardButton(text=buttons.servers)
     keyboard.add(button_support, button1)
     keyboard.add(button2, button3)
     keyboard.add(button5, button4)
@@ -73,3 +74,4 @@ def manage_servers(servers_list):
             InlineKeyboardButton(button_text, callback_data="user_change_server_state_{}".format(server_ip))
         )
     return markup
+
