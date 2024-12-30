@@ -2,6 +2,8 @@ import vpn_bot.commands.dbcon as dbcon
 from vpn_bot.utils.logger import Logger
 
 logger = Logger(__name__)
+
+
 class UserKey:
     """
     Methods:
@@ -10,6 +12,7 @@ class UserKey:
         delete_user_keys - удаляет все ключи пользователя
         get_user_traffic - Получение их БД количества трафика
     """
+
     def __init__(self, telegram_id):
         self.telegram_id = telegram_id
         self.user_state = dbcon.get_user_state(telegram_id)
@@ -34,7 +37,8 @@ class UserKey:
                 elif self.servers_count > self.keys_count:
                     logger.info("Серверов больше чем ключей, регистрируем новые ключи для тех серверов, где нет ключей")
                     unregistered_servers = self.get_unregistered_servers()
-                    logger.info("У пользователя нет ключа/ей на сервере/ах с id {}, регистрируем".format(unregistered_servers))
+                    logger.info(
+                        "У пользователя нет ключа/ей на сервере/ах с id {}, регистрируем".format(unregistered_servers))
                     if dbcon.reg_user_keys(self.telegram_id, unregistered_servers):
                         logger.info("Ключи успешно зарегистрированы")
                     else:
@@ -124,14 +128,14 @@ class UserKey:
         elif self.keys_count == 1:
             try:
                 size = dbcon.execute_query(
-                """
-                SELECT 
-                    traffic
-                FROM
-                    users_vpn_keys
-                WHERE
-                    telegram_id = '{}'
-                """.format(self.telegram_id))[0]
+                    """
+                    SELECT 
+                        traffic
+                    FROM
+                        users_vpn_keys
+                    WHERE
+                        telegram_id = '{}'
+                    """.format(self.telegram_id))[0]
                 if size != None:
                     return int(size)
                 elif size == None:
