@@ -54,9 +54,9 @@ provider_token = config.PROVIDER_TOKEN
 
 # More about Payments: https://core.telegram.org/bots/payments
 
-prices_1 = [LabeledPrice(label="Доступ на 1 месяц", amount=7500)]
-prices_2 = [LabeledPrice(label="Доступ на 3 месяца", amount=22500)]
-prices_3 = [LabeledPrice(label="Доступ на 6 месяцев", amount=45000)]
+prices_1 = [LabeledPrice(label="Доступ на 1 месяц", amount=10000)]
+prices_2 = [LabeledPrice(label="Доступ на 3 месяца", amount=30000)]
+prices_3 = [LabeledPrice(label="Доступ на 6 месяцев", amount=60000)]
 shipping_options = [
     ShippingOption(id="instant", title="WorldWide Teleporter").add_price(
         LabeledPrice("Teleporter", 1000)
