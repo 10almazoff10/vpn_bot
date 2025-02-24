@@ -218,37 +218,7 @@ def status(message):
             logger.info(f"Пользователь {sender_telegram_id} запросил варианты оплаты")
 
             bot.send_message(
-                message.chat.id, "Переход к форме оплаты...", parse_mode="Markdown"
-            )
-
-            bot.send_invoice(
-                message.chat.id,  # chat_id
-                "Доступ к VPN на 1 месяц",  # title
-                " Самый быстрый VPN сервер",  # description
-                "00001",  # invoice_payload
-                provider_token,  # provider_token
-                "RUB",  # currency
-                prices_1,
-            )
-
-            bot.send_invoice(
-                message.chat.id,  # chat_id
-                "Доступ к VPN на 3 месяца",  # title
-                "3 месяца доступа к лучшему VPN",  # description
-                "00001",  # invoice_payload
-                provider_token,  # provider_token
-                "RUB",  # currency
-                prices_2,
-            )
-
-            bot.send_invoice(
-                message.chat.id,  # chat_id
-                "Доступ к VPN на 6 месяцев",  # title
-                "Если брать то по полной",  # description
-                "00001",  # invoice_payload
-                provider_token,  # provider_token
-                "RUB",  # currency
-                prices_3,
+                message.chat.id, "В данном боте оплата больше не принимается, пожалуйста, перейдите  в новый бот: @greatvpn_xraybot", parse_mode="Markdown"
             )
 
         elif message.text == buttons.operations:
